@@ -5,7 +5,7 @@
 <head py:match="head" py:attrs="select('@*')">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta charset="${response.charset}" />
-  <title py:if="False">Your generic title goes here</title>
+  <title py:if="True">growthDB</title>
   <meta py:replace="select('*')"/>
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}" />
   <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
@@ -23,16 +23,22 @@
       </button>
       <a class="navbar-brand" href="${tg.url('/')}">
         <img src="${tg.url('/img/turbogears_logo.png')}" height="20" alt="TurboGears 2"/>
-        ${getattr(tmpl_context, 'project_name', 'turbogears2')}
+        ${getattr(tmpl_context, 'project_name', 'growthDB')}
       </a>
     </div>
 
     <div class="collapse navbar-collapse" id="navbar-content">
       <ul class="nav navbar-nav">
-        <li class="${('', 'active')[value_of('page') == 'index']}"><a href="${tg.url('/')}">Welcome</a></li>
+        <li class="${('', 'active')[value_of('page') == 'index']}"><a href="${tg.url('/strain')}">Strains</a></li>
+        <li class="${('', 'active')[value_of('page') == 'index']}"><a href="${tg.url('/experimental_design')}">Experimental Designs</a></li>
+        <li class="${('', 'active')[value_of('page') == 'index']}"><a href="${tg.url('/project')}">Projects</a></li>
+        <li class="${('', 'active')[value_of('page') == 'index']}"><a href="${tg.url('/plate')}">Plates</a></li>
+        <li class="${('', 'active')[value_of('page') == 'index']}"><a href="${tg.url('/well')}">Wells</a></li>
+        <li class="${('', 'active')[value_of('page') == 'index']}"><a href="${tg.url('/media')}">Media</a></li>
+        <!-- <li class="${('', 'active')[value_of('page') == 'index']}"><a href="${tg.url('/')}">Welcome</a></li>
         <li class="${('', 'active')[value_of('page') == 'about']}"><a href="${tg.url('/about')}">About</a></li>
         <li class="${('', 'active')[value_of('page') == 'data']}"><a href="${tg.url('/data')}">Serving Data</a></li>
-        <li class="${('', 'active')[value_of('page') == 'environ']}"><a href="${tg.url('/environ')}">WSGI Environment</a></li>
+        <li class="${('', 'active')[value_of('page') == 'environ']}"><a href="${tg.url('/environ')}">WSGI Environment</a></li> -->
       </ul>
 
       <ul py:if="tg.auth_stack_enabled" class="nav navbar-nav navbar-right">

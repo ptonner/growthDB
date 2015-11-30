@@ -8,7 +8,7 @@ from tg.exceptions import HTTPFound
 from tg import predicates
 from growthdb import model
 from growthdb.controllers.secure import SecureController
-from growthdb.model import DBSession, ExperimentalDesign, ExperimentalDesign_element
+from growthdb.model import DBSession, ExperimentalDesign, ExperimentalDesign_element, Media, Plate, Project, Well
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 from tgext.admin.controller import AdminController
 
@@ -30,7 +30,7 @@ __all__ = ['RootController']
 
 #     action = '/save_movie'
 
-from tgext.crud import CrudRestController
+from tgext.crud import CrudRestController,EasyCrudRestController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
@@ -114,7 +114,7 @@ experimental_design_table_filler = ExperimentalDesignTableFiller(DBSession)
 
 class ExperimentalDesignTable(TableBase):
     __model__ = ExperimentalDesign
-    __omit_fields__ = ['id','strain_id']
+    __omit_fields__ = ['id','strain_id','media_id']
     __xml_fields__ = ['strain',"experimental_design_elements"]
 experimental_design_table = ExperimentalDesignTable(DBSession)
 
@@ -183,6 +183,155 @@ class ExperimentalDesignElementController(CrudRestController):
     class table_filler_type(TableFiller):
         __model__ = ExperimentalDesign_element
 
+"""Media"""
+
+class MediaController(CrudRestController):
+    model = Media
+
+    class new_form_type(AddRecordForm):
+        __model__ = Media
+        # __omit_fields__ = ['genre_id', 'movie_id']
+
+    class edit_form_type(EditableForm):
+        __model__ = Media
+        # __omit_fields__ = ['genre_id', 'movie_id']
+
+    class edit_filler_type(EditFormFiller):
+        __model__ = Media
+
+    class table_type(TableBase):
+        __model__ = Media
+        __omit_fields__ = ['id']
+
+    class table_filler_type(TableFiller):
+        __model__ = Media
+
+"""Project"""
+
+class ProjectController(CrudRestController):
+    model = Project
+
+    class new_form_type(AddRecordForm):
+        __model__ = Project
+        # __omit_fields__ = ['genre_id', 'movie_id']
+
+    class edit_form_type(EditableForm):
+        __model__ = Project
+        # __omit_fields__ = ['genre_id', 'movie_id']
+
+    class edit_filler_type(EditFormFiller):
+        __model__ = Project
+
+    class table_type(TableBase):
+        __model__ = Project
+        __omit_fields__ = ['id','user_id']
+
+    class table_filler_type(TableFiller):
+        __model__ = Project
+
+"""Plate"""
+
+# from tw.api import CSSLink, WidgetsList
+from tw2.forms import (TableForm,
+    SingleSelectField, Spacer, TextField, TextArea,FileField)
+from tg import url
+
+
+class PlateForm(TableForm):
+
+    # class fields(WidgetsList):
+    #     name = TextField()
+    #     description = TextField()
+    #     raw_data = FileField()
+
+    # template = "toscasample.widgets.templates.table_form"
+    # css = [CSSLink(link=url('/css/tooltips.css'))]
+
+    # genre_options = [x for x in enumerate((
+    #     'Action & Adventure', 'Animation', 'Comedy',
+    #     'Documentary', 'Drama', 'Sci-Fi & Fantasy'))]
+
+    # fields = [
+    #     TextField('name', label_text='Movie Title',
+    #         help_text='Please enter the full title of the movie.'),
+    #     Spacer(),
+    #     TextField('description', label_text='Movie Title',
+    #         help_text='Please enter the full title of the movie.'),
+    #     Spacer(),
+    #     FileField('raw_data',
+    #         help_text = 'Please provide a picture for this movie.'),
+    #     Spacer()]
+
+    submit_text = 'Save Movie'
+
+create_plate = PlateForm('create_plate')
+
+
+class PlateController(EasyCrudRestController):
+    model = Plate
+
+    # __form_options__ = {
+    #     '__field_widget_types__':{'raw_file':FileField},}
+
+    class new_form_type(PlateForm):
+        pass
+
+    # class new_form_type(AddRecordForm):
+    #     __model__ = Plate
+    #     # __omit_fields__ = ['genre_id', 'movie_id']
+    #     __form_options__ = {
+    #     '__field_widget_types__':{'raw_file':FileField},}
+
+    # class edit_form_type(EditableForm):
+    #     __model__ = Plate
+    #     # __omit_fields__ = ['genre_id', 'movie_id']
+
+    # class edit_filler_type(EditFormFiller):
+    #     __model__ = Plate
+
+    # class table_type(TableBase):
+    #     __model__ = Plate
+    #     __omit_fields__ = ['id']
+
+    # class table_filler_type(TableFiller):
+    #     __model__ = Plate
+
+"""Well"""
+
+class ExperimentalDesignField(PropertyMultipleSelectField):
+    def prepare(self):
+        super(ExperimentalDesignField, self).prepare()
+
+        for i,o in enumerate(self.options):
+            k,v = o
+            ed = DBSession.query(ExperimentalDesign).filter(ExperimentalDesign.id==k['value']).one()
+            print ed
+            s = "%s, %s, (%s)" % (ed.strain.gene,ed.media.name,','.join([ede.key+": "+ede.value for ede in ed.experimental_design_elements]))
+            self.options[i] = (k,s)
+
+class WellController(CrudRestController):
+    model = Well
+
+    class new_form_type(AddRecordForm):
+        __model__ = Well
+        # __omit_fields__ = ['genre_id', 'movie_id']
+        experimental_design = ExperimentalDesignField
+
+    class edit_form_type(EditableForm):
+        __model__ = Well
+        # __omit_fields__ = ['genre_id', 'movie_id']
+
+    class edit_filler_type(EditFormFiller):
+        __model__ = Well
+
+    class table_type(TableBase):
+        __model__ = Well
+        __omit_fields__ = ['id']
+
+        experimental_design = ExperimentalDesignField
+
+    class table_filler_type(TableFiller):
+        __model__ = Well
 
 class RootController(BaseController):
     """
@@ -206,6 +355,10 @@ class RootController(BaseController):
     strain = StrainController(DBSession)
     experimental_design = ExperimentalDesignController(DBSession)
     experimental_design_element = ExperimentalDesignElementController(DBSession)
+    media = MediaController(DBSession)
+    project = ProjectController(DBSession)
+    # plate = PlateController(DBSession)
+    well = WellController(DBSession)
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "growthdb"
@@ -231,9 +384,15 @@ class RootController(BaseController):
     #     # # parent = DBSession.query(Strain).filter_by(id=strain.parent).one()
     #     return dict(strain=strain)
 
-    @expose('growthdb.templates.editstrain')
-    def strainedit(self, *args, **kw):
-        return dict(page='nrc1', form=MovieForm)
+    # @expose('growthdb.templates.editstrain')
+    # def strainedit(self, *args, **kw):
+    #     return dict(page='nrc1', form=MovieForm)
+
+    @expose('growthdb.templates.plate')
+    def newplate(self, **kw):
+        """Show form to add new movie data record."""
+        tmpl_context.form = create_plate
+        return dict(modelname='Plate', value=kw)
 
     @expose('growthdb.templates.about')
     def about(self):

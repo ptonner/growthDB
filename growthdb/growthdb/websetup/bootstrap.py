@@ -19,6 +19,16 @@ def bootstrap(command, conf, vars):
 
         model.DBSession.add(u)
 
+        project = model.Project()
+        project.name = "hsal_ko_library"
+        model.DBSession.add(project)
+
+        plate = model.Plate()
+        plate.name="ura3_control"
+        plate.project = project
+        plate.raw_data = open("/home/ptonner/dev/gp_growth/data/raw/hsal_ko/20140926 ura3 control/ura3_control.csv")
+        model.DBSession.add(plate)
+
         # nrc1 = model.Strain("nrc1",None)
         # model.DBSession.add(nrc1)
         nrc1 = model.Strain()
