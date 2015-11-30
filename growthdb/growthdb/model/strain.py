@@ -13,12 +13,14 @@ class Strain(DeclarativeBase):
     __tablename__ = 'strain'
 
     id = Column(Integer, primary_key=True)
-    parent = Column(ForeignKey('strain.id'))
-    gene = Column(UnicodeText)
+    gene = Column(UnicodeText,unique=True)
+    parent_id = Column(ForeignKey('strain.id'))
+    parent = relation('Strain', remote_side=[id], backref="children")
+    # parent_gene = relation("Strain",remote_side=[gene])
 
-    def __init__(self, gene, parent):
-        self.gene = gene
-        self.parent = parent
+    # def __init__(self, gene, parent):
+    #     self.gene = gene
+    #     self.parent = parent
 
     def __repr__(self):
-        return "Strain (%r)" % self.gene
+        return "Strain (%r <- %r)" % (self.gene,self.parent)

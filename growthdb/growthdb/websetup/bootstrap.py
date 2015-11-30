@@ -19,13 +19,16 @@ def bootstrap(command, conf, vars):
 
         model.DBSession.add(u)
 
-        nrc1 = model.Strain("nrc1",None)
+        # nrc1 = model.Strain("nrc1",None)
+        # model.DBSession.add(nrc1)
+        nrc1 = model.Strain()
+        mrc1.gene = "nrc1"
         model.DBSession.add(nrc1)
 
-        ura3 = model.Strain("ura3",nrc1.id)
-        model.DBSession.add(ura3)
+        # ura3 = model.Strain("ura3",nrc1)
+        # model.DBSession.add(ura3)
 
-        ed1 = model.ExperimentalDesign(ura3)
+        ed1 = model.ExperimentalDesign(nrc1)
         ed1['mM PQ'] = "0.333"
         model.DBSession.add(ed1)
 

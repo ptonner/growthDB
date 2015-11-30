@@ -15,7 +15,71 @@ from tgext.admin.controller import AdminController
 from growthdb.lib.base import BaseController
 from growthdb.controllers.error import ErrorController
 
+from growthdb.model.strain import Strain
+
 __all__ = ['RootController']
+
+# import tw2.core as twc
+# import tw2.forms as twf
+
+# class MovieForm(twf.Form):
+#     class child(twf.TableLayout):
+#         title = twf.TextField()
+#         director = twf.TextField(value='Default Director')
+#         genres = twf.CheckBoxList(options=['Action', 'Comedy', 'Romance', 'Sci-fi'])
+
+#     action = '/save_movie'
+
+from tgext.crud import CrudRestController
+from sprox.tablebase import TableBase
+from sprox.fillerbase import TableFiller
+from sprox.formbase import AddRecordForm
+from sprox.widgets import PropertySingleSelectField
+
+class StrainTableFiller(TableFiller):
+    __model__ = Strain
+
+    def children(self, obj):
+       # print 'obj:',obj
+       children = ', '.join(['<a href="/strain/'+str(d.gene)+'">'+d.gene+'</a>'
+                              for d in obj.children])
+       return children.join(('<div>', '</div>'))
+
+    def parent(self, obj):
+       # print 'obj:',obj
+       # parent = DBSession
+       # children = ', '.join(['<a href="/strain/'+str(d.gene)+'">'+d.gene+'</a>'
+       #                        for d in obj.children])
+       parent = ""
+       if not obj.parent is None:
+           parent = '<a href="/strain/'+str(obj.parent.gene)+'">'+obj.parent.gene+'</a>'
+       return parent.join(('<div>', '</div>'))
+
+strain_table_filler = StrainTableFiller(DBSession)
+
+class StrainTable(TableBase):
+    __model__ = Strain
+    __omit_fields__ = ['id','parent_id']
+    __xml_fields__ = ['children','parent']
+strain_table = StrainTable(DBSession)
+
+class StrainAddForm(AddRecordForm):
+    __model__ = Strain
+    __omit_fields__ = ['id','experimental_designs','parent_id','children']
+    __dropdown_field_names__ = {'parent':'gene'}
+    # __field_attrs__ = {'gene':{'rows':'2'}}
+    
+strain_add_form = StrainAddForm(DBSession)
+
+
+class StrainController(CrudRestController):
+    model = Strain
+    table = strain_table
+    table_filler = strain_table_filler
+    new_form = strain_add_form
+
+# class RootController(BaseController):
+    # movie = MovieController(DBSession)
 
 
 class RootController(BaseController):
@@ -37,6 +101,8 @@ class RootController(BaseController):
 
     error = ErrorController()
 
+    strain = StrainController(DBSession)
+
     def _before(self, *args, **kw):
         tmpl_context.project_name = "growthdb"
 
@@ -44,6 +110,26 @@ class RootController(BaseController):
     def index(self):
         """Handle the front-page."""
         return dict(page='index')
+
+    # @expose('growthdb.templates.strain')
+    # def strain(self,pagename="nrc1"):
+    #     """Handle the strain-page."""
+    #     from sqlalchemy.exc import InvalidRequestError
+
+    #     try:
+    #         strain = DBSession.query(Strain).filter_by(gene=pagename).one()
+    #     except InvalidRequestError:
+    #         raise redirect("strainnotfound", pagename=pagename)
+
+    #     # strain = DBSession.query(Strain).filter_by(gene=pagename).one()
+    #     # print "strain:", strain
+    #     # print "parent:",strain.parent
+    #     # # parent = DBSession.query(Strain).filter_by(id=strain.parent).one()
+    #     return dict(strain=strain)
+
+    @expose('growthdb.templates.editstrain')
+    def strainedit(self, *args, **kw):
+        return dict(page='nrc1', form=MovieForm)
 
     @expose('growthdb.templates.about')
     def about(self):
