@@ -1,0 +1,4 @@
+recursive-include growthdb/public *
+include growthdb/public/favicon.ico
+recursive-include growthdb/i18n *
+recursive-include growthdb/templates *
