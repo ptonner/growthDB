@@ -7,8 +7,8 @@ from sqlalchemy.types import Integer, Text
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from growthdb.model.strain import Strain
-from growthdb.model import DeclarativeBase, metadata, DBSession
+# from growthdb.model.strain import Strain
+from growthdb.model import DeclarativeBase, metadata, DBSession, Strain, Media
 
 class ProxiedDictMixin(object):
     """Adds obj[key] access to a mapped class.
@@ -70,6 +70,9 @@ class ExperimentalDesign(DeclarativeBase):
 
     strain_id = Column(Integer, ForeignKey('strain.id'))
     strain = relationship("Strain", backref=backref('experimental_designs', order_by=id))
+
+    media_id = Column(Integer, ForeignKey('media.id'))
+    media = relationship("Media", backref=backref('experimental_designs', order_by=id))
 
     # experimental_design_elements = relationship("ExperimentalDesign_element",
     # 			backref="experimental_designs")
