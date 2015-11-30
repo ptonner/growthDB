@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <!-- <title>${strain.gene} -  growthDB</title> -->
+</head>
+
+<body>
+    <div class="main_content">
+        <!-- <div style="float:right; width: 10em;"> Viewing
+            <span py:replace="strain.gene">Page Name Goes Here</span>
+        </div> -->
+
+        <div id="getting_started">
+            ${form.display(value=dict(title='default title'))}
+        </div>
+
+        <!-- <div py:replace="strain.parent">parent goes here.</div>
+        <a href="/strain/${strain.parent}"><div py:replace="strain.parent">parent goes here.</div></a>
+
+        <div>
+            <a href="/editstrain/${strain.gene}">Edit this page</a>
+        </div> -->
+    </div>
+</body>
+</html>
