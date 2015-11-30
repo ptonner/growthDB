@@ -8,7 +8,7 @@ from tg.exceptions import HTTPFound
 from tg import predicates
 from growthdb import model
 from growthdb.controllers.secure import SecureController
-from growthdb.model import DBSession, ExperimentalDesign
+from growthdb.model import DBSession, ExperimentalDesign, ExperimentalDesign_element
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 from tgext.admin.controller import AdminController
 
@@ -32,8 +32,8 @@ __all__ = ['RootController']
 
 from tgext.crud import CrudRestController
 from sprox.tablebase import TableBase
-from sprox.fillerbase import TableFiller
-from sprox.formbase import AddRecordForm
+from sprox.fillerbase import TableFiller, EditFormFiller
+from sprox.formbase import AddRecordForm, EditableForm
 from sprox.widgets import PropertySingleSelectField
 
 class StrainTableFiller(TableFiller):
@@ -67,19 +67,121 @@ class StrainAddForm(AddRecordForm):
     __model__ = Strain
     __omit_fields__ = ['id','experimental_designs','parent_id','children']
     __dropdown_field_names__ = {'parent':'gene'}
-    # __field_attrs__ = {'gene':{'rows':'2'}}
-    
+    # __field_attrs__ = {'gene':{'rows':'2'}}    
 strain_add_form = StrainAddForm(DBSession)
 
+class StrainEditForm(EditableForm):
+    __model__ = Strain
+    __omit_fields__ = ['id','experimental_designs','parent_id','children']
+    __dropdown_field_names__ = {'parent':'gene'}
+strain_edit_form = StrainEditForm(DBSession)
+
+
+class StrainEditFiller(EditFormFiller):
+    __model__ = Strain
+strain_edit_filler = StrainEditFiller(DBSession)
 
 class StrainController(CrudRestController):
     model = Strain
     table = strain_table
     table_filler = strain_table_filler
     new_form = strain_add_form
+    edit_form = strain_edit_form
+    edit_filler = strain_edit_filler
 
-# class RootController(BaseController):
-    # movie = MovieController(DBSession)
+"""Experimental Design controller"""
+
+class ExperimentalDesignTableFiller(TableFiller):
+    __model__ = ExperimentalDesign
+
+    def experimental_design_elements(self, obj):
+       # print 'obj:',obj
+       ede = ', '.join(['<a href="/experimental_design_element/">'+d.key +": "+d.value+'</a>'
+                              for d in obj.experimental_design_elements])
+       return ede.join(('<div>', '</div>'))
+
+    def strain(self, obj):
+       # print 'obj:',obj
+       # parent = DBSession
+       # children = ', '.join(['<a href="/strain/'+str(d.gene)+'">'+d.gene+'</a>'
+       #                        for d in obj.children])
+       strain = ""
+       if not obj.strain is None:
+           parent = '<a href="/strain/'+str(obj.strain.gene)+'">'+obj.strain.gene+'</a>'
+       return parent.join(('<div>', '</div>'))
+
+experimental_design_table_filler = ExperimentalDesignTableFiller(DBSession)
+
+class ExperimentalDesignTable(TableBase):
+    __model__ = ExperimentalDesign
+    __omit_fields__ = ['id','strain_id']
+    __xml_fields__ = ['strain',"experimental_design_elements"]
+experimental_design_table = ExperimentalDesignTable(DBSession)
+
+from sprox.widgets import PropertySingleSelectField,PropertyMultipleSelectField
+
+class ExperimentalDesignElementField(PropertyMultipleSelectField):
+    def prepare(self):
+        super(ExperimentalDesignElementField, self).prepare()
+
+        for i,o in enumerate(self.options):
+            k,v = o
+            ede = DBSession.query(ExperimentalDesign_element).filter(ExperimentalDesign_element.id==k['value']).one()
+            print ede
+            self.options[i] = (k,"%s: %s" % (ede.key,ede.value))
+
+class ExperimentalDesignAddForm(AddRecordForm):
+    __model__ = ExperimentalDesign
+    # __omit_fields__ = ['id','experimental_designs','parent_id','children']
+    __dropdown_field_names__ = {'strain':'gene'}
+    experimental_design_elements = ExperimentalDesignElementField
+
+experimental_design_add_form = ExperimentalDesignAddForm(DBSession)
+
+class ExpeirmentalDesignEditForm(EditableForm):
+    __model__ = ExperimentalDesign
+    # __omit_fields__ = ['id','experimental_designs','parent_id','children']
+    __dropdown_field_names__ = {'Strain':'gene'}
+experimental_design_edit_form = ExpeirmentalDesignEditForm(DBSession)
+
+class ExperimentalDesignEditFiller(EditFormFiller):
+    __model__ = ExperimentalDesign
+experimental_design_edit_filler = ExperimentalDesignEditFiller(DBSession)
+
+class ExperimentalDesignController(CrudRestController):
+    model = ExperimentalDesign
+    table = experimental_design_table
+    table_filler = experimental_design_table_filler
+    new_form = experimental_design_add_form
+    edit_form = experimental_design_edit_form
+    edit_filler = experimental_design_edit_filler
+
+"""Experimental Design Element"""
+from tgext.crud import CrudRestController
+from sprox.tablebase import TableBase
+from sprox.formbase import EditableForm, AddRecordForm
+from sprox.fillerbase import TableFiller, EditFormFiller
+
+class ExperimentalDesignElementController(CrudRestController):
+    model = ExperimentalDesign_element
+
+    class new_form_type(AddRecordForm):
+        __model__ = ExperimentalDesign_element
+        # __omit_fields__ = ['genre_id', 'movie_id']
+
+    class edit_form_type(EditableForm):
+        __model__ = ExperimentalDesign_element
+        # __omit_fields__ = ['genre_id', 'movie_id']
+
+    class edit_filler_type(EditFormFiller):
+        __model__ = ExperimentalDesign_element
+
+    class table_type(TableBase):
+        __model__ = ExperimentalDesign_element
+        # __omit_fields__ = ['genre_id', 'movie_id']
+
+    class table_filler_type(TableFiller):
+        __model__ = ExperimentalDesign_element
 
 
 class RootController(BaseController):
@@ -102,6 +204,8 @@ class RootController(BaseController):
     error = ErrorController()
 
     strain = StrainController(DBSession)
+    experimental_design = ExperimentalDesignController(DBSession)
+    experimental_design_element = ExperimentalDesignElementController(DBSession)
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "growthdb"

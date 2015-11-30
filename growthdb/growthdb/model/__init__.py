@@ -59,6 +59,6 @@ def init_model(engine):
 # Import your model modules here.
 from growthdb.model.auth import User, Group, Permission
 from growthdb.model.strain import Strain
-from growthdb.model.experimental_design import ExperimentalDesign
+from growthdb.model.experimental_design import ExperimentalDesign, ExperimentalDesign_element
 
 __all__ = ('User', 'Group', 'Permission')

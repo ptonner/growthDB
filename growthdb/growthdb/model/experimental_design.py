@@ -37,20 +37,31 @@ class ProxiedDictMixin(object):
     def __delitem__(self, key):
         del self._proxied[key]
 
+association_table = Table('experimental_design_association', DeclarativeBase.metadata,
+    Column('experimental_design_element_id', Integer, ForeignKey('experimental_design_element.id')),
+    Column('experimental_design_id', Integer, ForeignKey('experimental_design.id')),
+    # Column('right_id', Integer, ForeignKey('right.id'))
+)
+
 class ExperimentalDesign_element(DeclarativeBase):
     """An experimental design element."""
 
     __tablename__ = 'experimental_design_element'
 
-    ed_id = Column(ForeignKey('experimental_design.id'), primary_key=True)
-    key = Column(Unicode(64), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    key = Column(UnicodeText)
     value = Column(UnicodeText)
 
+    experimental_designs = relationship("ExperimentalDesign",
+                    secondary=association_table,
+                    backref="experimental_design_elements")
+
     def __repr__(self):
-        return "%r" % (self.value)
+        return "%r:%r" % (self.key,self.value)
 
 
-class ExperimentalDesign(ProxiedDictMixin, DeclarativeBase):
+# class ExperimentalDesign(ProxiedDictMixin, DeclarativeBase):
+class ExperimentalDesign(DeclarativeBase):
     """an experimental design"""
 
     __tablename__ = 'experimental_design'
@@ -60,15 +71,16 @@ class ExperimentalDesign(ProxiedDictMixin, DeclarativeBase):
     strain_id = Column(Integer, ForeignKey('strain.id'))
     strain = relationship("Strain", backref=backref('experimental_designs', order_by=id))
 
-    experimental_design_elements = relationship("ExperimentalDesign_element",
-                collection_class=attribute_mapped_collection('key'))
+    # experimental_design_elements = relationship("ExperimentalDesign_element",
+    # 			backref="experimental_designs")
+                # collection_class=attribute_mapped_collection('key'))
 
-    _proxied = association_proxy("experimental_design_elements", "value",
-                        creator=
-                        lambda key, value: ExperimentalDesign_element(key=key, value=value))
+    # _proxied = association_proxy("experimental_design_elements", "value",
+    #                     creator=
+    #                     lambda key, value: ExperimentalDesign_element(key=key, value=value))
 
-    def __init__(self, strain):
-        self.strain = strain
+    # def __init__(self, strain):
+    #     self.strain = strain
 
     def __repr__(self):
         return "ExperimentalDesign(%r,%r)" % (self.strain,self.experimental_design_elements)
