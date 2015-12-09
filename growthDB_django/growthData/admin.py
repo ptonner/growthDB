@@ -1,3 +1,11 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ExperimentalDesign, DesignElement, Design, Project, Experimenter, Well, Plate
+
+admin.site.register(ExperimentalDesign)
+admin.site.register(DesignElement)
+admin.site.register(Design)
+admin.site.register(Project)
+admin.site.register(Experimenter)
+admin.site.register(Well)
+admin.site.register(Plate)
