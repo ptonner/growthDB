@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Wells{% endblock %}
+
+{% block content %}
+<style>
+/*body {background-color:lightgrey;}
+h1   {color:blue;}
+p    {color:green;}*/
+td {
+    text-align: center;
+}
+</style>
+
+
+    <table style="width:100%" border="1">
+    	<tr>
+    		<th>Well</th>
+    		<th>Plate</th>
+    		<th>Number</th>
+    		<th>Biological Replicae</th>
+    		<th>Technical Replicate</th>
+    		<th>Experimental Design</th>
+    	</tr>
+
+        {% for well in well_list %}
+	        <tr>
+	            <td><a href="{% url 'growthData:well' well.id %}">{{ well|linebreaks }}</a></td>
+	            <td><a href="{% url 'growthData:plate' well.plate.id %}">{{ well.plate }}</a></td>
+	            <td>{{ well.number }}</a></td>
+	            <td>{{ well.biologicalReplicate }}</a></td>
+	            <td>{{ well.technicalReplicate }}</a></td>
+	            {% if well.experimentalDesign.id%}
+	            	<td><a href="{% url 'growthData:experimentalDesign' well.experimentalDesign.id %}">{{ well.experimentalDesign }}</a></td>
+	            {% else %}
+	            	<td>{{ well.experimentalDesign }}</td>
+	            {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

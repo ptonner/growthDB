@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Plates{% endblock %}
+
+{% block content %}
+    <table style="width:100%" border="1">
+    	<tr>
+    		<th>Plate</th>
+    		<th>Number of wells</th>
+    	</tr>
+
+        {% for plate in plate_list %}
+	        <tr>
+	            <td><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></td>
+	            <td>{{ plate.well_set.count}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

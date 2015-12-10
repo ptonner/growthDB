@@ -1,0 +1,11 @@
+{% if latest_plate_list %}
+    <ul>
+    {% for plate in latest_plate_list %}
+        <!-- <li><a href="/growthData/plate/{{ plate.id }}/">{{ plate.name }}</a></li> -->
+        <li><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></li>
+        
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No plates are available.</p>
+{% endif %}
