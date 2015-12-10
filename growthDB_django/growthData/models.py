@@ -15,7 +15,6 @@ class Plate(models.Model):
 	def get_absolute_url(self):
 		return reverse('plate', kwargs={'pk': self.pk})
 
-
 class Experimenter(models.Model):
 	name = models.CharField(max_length=200)
 	email = models.CharField(max_length=200)
@@ -31,7 +30,6 @@ class Project(models.Model):
 	def __str__(self):
 		return self.name
 
-
 class Well(models.Model):
 	experimentalDesign = models.ForeignKey('ExperimentalDesign',null=True)
 	number = models.IntegerField(default=0)
@@ -46,9 +44,16 @@ class Well(models.Model):
 	def __str__(self):
 		return "%s (%s) - (%s)" % (self.plate, self.number, self.experimentalDesign)
 
+class Strain(models.Model):
+	parent = models.ForeignKey('self')
+	name = models.CharField(max_length=20)
+
+	def __str__(self):
+		return "%s (%s)" % (self.name, self.parent)
+
 
 class ExperimentalDesign(models.Model):
-	strain = models.ForeignKey('self')
+	strain = models.ForeignKey('Strain')
 	designElements = models.ManyToManyField("DesignElement")
 
 	def __str__(self):
@@ -63,7 +68,6 @@ class DesignElement(models.Model):
 
 	def __str__(self):
 		return self.design, self.value
-
 
 class Design(models.Model):
 
