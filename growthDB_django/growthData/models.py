@@ -45,19 +45,26 @@ class Well(models.Model):
 		return "%s (%s) - (%s)" % (self.plate, self.number, self.experimentalDesign)
 
 class Strain(models.Model):
-	parent = models.ForeignKey('self')
+	parent = models.ForeignKey('self',null=True,blank=True, related_name='subarticles')
 	name = models.CharField(max_length=20)
 
 	def __str__(self):
-		return "%s (%s)" % (self.name, self.parent)
+		if self.parent:
+			return "%s ( %s )" % (self.name, self.parent.name)
+		else:
+			return "%s ( %s )" % (self.name, None)
 
 
 class ExperimentalDesign(models.Model):
 	strain = models.ForeignKey('Strain')
 	designElements = models.ManyToManyField("DesignElement")
 
+	def designElementString(self):
+		s = ",".join(str(x) for x in self.designElements.all())
+		return s
+
 	def __str__(self):
-		s = ",".join(str(x) for x in self.designElements)
+		s = ",".join(str(x) for x in self.designElements.all())
 
 		return "%s - %s" % (self.strain,s)
 
@@ -67,7 +74,7 @@ class DesignElement(models.Model):
 	value = models.CharField(max_length=100)
 
 	def __str__(self):
-		return self.design, self.value
+		return "%s: %s" % (self.design, self.value)
 
 class Design(models.Model):
 
@@ -79,7 +86,7 @@ class Design(models.Model):
 
 	name = models.CharField(max_length=60)
 	description = models.CharField(max_length=1000)
-	type = models.CharField(max_length=1, choices=TYPES)
+	type = models.CharField(max_length=5, choices=TYPES)
 
 	def __str__(self):
 		return self.name
