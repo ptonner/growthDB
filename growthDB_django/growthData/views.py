@@ -3,8 +3,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
+from django.views.generic import ListView
 
-from .models import Plate
+from .models import Plate, Well
 from .forms import PlateForm
 
 def index(request):
@@ -59,16 +60,24 @@ def experimentalDesign(request, ed_id):
 #     fields = ['name','project','experimenter','dataFile']
 
 from django.utils import timezone
+import pandas as pd
+
+def handle_file(f):
+	data = pd.read_csv(f)
+	print data.shape
 
 def create_plate(request):
     if request.method == 'POST':
         form = PlateForm(request.POST, request.FILES)
 
         if form.is_valid():
-            print form.cleaned_data
-            # instance = Plate(request.POST['experimenter'],request.POST['project'],request.POST['experimenter'],request.POST['name'],date=timezone.now(),dataFile=request.FILES['dataFile'])
-            instance = Plate(date=timezone.now(),**form.cleaned_data)
-            instance.save()
+            # plate = Plate(date=timezone.now(),**form.cleaned_data)
+            plate = Plate(**form.cleaned_data)
+            plate.save()
+
+            wells = [Well(plate=plate,number=i,biologicalReplicate=i,experimentalDesign=None) for i in range(200)]
+            [w.save() for w in wells]
+
             return HttpResponseRedirect('/growthData/plate/')
     else:
     	print "not post"
@@ -82,3 +91,20 @@ class PlateUpdate(UpdateView):
 class PlateDelete(DeleteView):
     model = Plate
     success_url = reverse_lazy('plateOverview')
+
+# Well views
+
+class WellList(ListView):
+    model = Well
+
+class WellUpdate(UpdateView):
+    model = Well
+    fields = ['name']
+
+class WellCreate(CreateView):
+    model = Well
+    fields = ['name']
+
+class PlateDelete(DeleteView):
+    model = Well
+    success_url = reverse_lazy('well')
