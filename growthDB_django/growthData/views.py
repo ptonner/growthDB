@@ -5,7 +5,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView
 
-from .models import Plate, Well
+from .models import Plate, Well, ExperimentalDesign
 from .forms import PlateForm
 
 def index(request):
@@ -71,7 +71,6 @@ def create_plate(request):
         form = PlateForm(request.POST, request.FILES)
 
         if form.is_valid():
-            # plate = Plate(date=timezone.now(),**form.cleaned_data)
             plate = Plate(**form.cleaned_data)
             plate.save()
 
@@ -92,6 +91,9 @@ class PlateDelete(DeleteView):
     model = Plate
     success_url = reverse_lazy('plateOverview')
 
+class PlateList(ListView):
+    model = Plate
+
 # Well views
 
 class WellList(ListView):
@@ -108,3 +110,7 @@ class WellCreate(CreateView):
 class PlateDelete(DeleteView):
     model = Well
     success_url = reverse_lazy('well')
+
+# Experimental Design
+class ExperimentalDesignList(ListView):
+    model = ExperimentalDesign
