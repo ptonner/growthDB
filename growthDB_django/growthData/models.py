@@ -5,7 +5,7 @@ from django.db import models
 class Plate(models.Model):
 	experimenter = models.ForeignKey('Experimenter')
 	project = models.ForeignKey('Project')
-	name = models.CharField(max_length=200)
+	name = models.CharField(max_length=200,unique=True)
 	date = models.DateField(auto_now_add=True)
 	dataFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
 
@@ -24,7 +24,7 @@ class Experimenter(models.Model):
 		return self.name
 
 class Project(models.Model):
-	name = models.CharField(max_length=20)
+	name = models.CharField(max_length=20,unique=True)
 	description = models.CharField(max_length=1000)
 	dataStarted = models.DateField(auto_now_add=True)
 
@@ -33,7 +33,7 @@ class Project(models.Model):
 
 
 class Well(models.Model):
-	experimentalDesign = models.ForeignKey('ExperimentalDesign')
+	experimentalDesign = models.ForeignKey('ExperimentalDesign',null=True)
 	number = models.IntegerField(default=0)
 
 	# these three fields constitute the replicate information
