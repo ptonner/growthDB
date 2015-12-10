@@ -12,6 +12,9 @@ class Plate(models.Model):
 	def __str__(self):
 		return self.name
 
+	def get_absolute_url(self):
+		return reverse('plate', kwargs={'pk': self.pk})
+
 
 class Experimenter(models.Model):
 	name = models.CharField(max_length=200)

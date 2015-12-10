@@ -1,7 +1,11 @@
-from django.shortcuts import render,get_object_or_404
-from django.http import HttpResponse
+from django.shortcuts import render,get_object_or_404, render_to_response
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.core.urlresolvers import reverse_lazy
+
 from .models import Plate
+from .forms import PlateForm
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -19,6 +23,26 @@ def plate(request, plate_id):
     #     raise Http404("Plate does not exist")
     return render(request, 'growthData/plate.html', {'plate': plate})
 
+# def plateCreate(request,):
+
+#     return render(request, 'growthData/plateCreate.html', {})
+    # question = get_object_or_404(Question, pk=question_id)
+    # try:
+    #     selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    # except (KeyError, Choice.DoesNotExist):
+    #     # Redisplay the question voting form.
+    #     return render(request, 'polls/detail.html', {
+    #         'question': question,
+    #         'error_message': "You didn't select a choice.",
+    #     })
+    # else:
+    #     selected_choice.votes += 1
+    #     selected_choice.save()
+    #     # Always return an HttpResponseRedirect after successfully dealing
+    #     # with POST data. This prevents data from being posted twice if a
+    #     # user hits the Back button.
+    #     return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+
 def plateOverview(request):
     latest_plate_list = Plate.objects.order_by('-date')[:5]
     context = {'latest_plate_list': latest_plate_list}
@@ -26,3 +50,35 @@ def plateOverview(request):
 
 def experimentalDesign(request, ed_id):
     return HttpResponse("You're voting on experimental design %s." % ed_id)
+
+
+# Plate views
+
+# class PlateCreate(CreateView):
+#     model = Plate
+#     fields = ['name','project','experimenter','dataFile']
+
+from django.utils import timezone
+
+def create_plate(request):
+    if request.method == 'POST':
+        form = PlateForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            print form.cleaned_data
+            # instance = Plate(request.POST['experimenter'],request.POST['project'],request.POST['experimenter'],request.POST['name'],date=timezone.now(),dataFile=request.FILES['dataFile'])
+            instance = Plate(date=timezone.now(),**form.cleaned_data)
+            instance.save()
+            return HttpResponseRedirect('/growthData/plate/')
+    else:
+    	print "not post"
+        form = PlateForm()
+    return render(request, 'growthData/plate_form.html', {'form': form})
+
+class PlateUpdate(UpdateView):
+    model = Plate
+    fields = ['name']
+
+class PlateDelete(DeleteView):
+    model = Plate
+    success_url = reverse_lazy('plateOverview')
