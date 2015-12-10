@@ -101,7 +101,9 @@ class WellList(ListView):
 
 class WellUpdate(UpdateView):
     model = Well
-    fields = ['name']
+    template_name_suffix = '_update_form'
+
+    fields = ['experimentalDesign','biologicalReplicate','technicalReplicate']
 
 class WellCreate(CreateView):
     model = Well
@@ -114,3 +116,19 @@ class PlateDelete(DeleteView):
 # Experimental Design
 class ExperimentalDesignList(ListView):
     model = ExperimentalDesign
+
+class ExperimentalDesignUpdate(UpdateView):
+    model = ExperimentalDesign
+
+
+    fields = ['strain','designElements']
+    template_name_suffix = '_update_form'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(ExperimentalDesignUpdate, self).get_context_data(**kwargs)
+        print dir(self)
+        print self.get_object()
+        # Add in a QuerySet of all the books
+        context['well_list'] = self.get_object().well_set.filter(experimentalDesign=self.get_object())
+        return context
