@@ -8,6 +8,10 @@ class Plate(models.Model):
 	name = models.CharField(max_length=200,unique=True)
 	date = models.DateField(auto_now_add=True)
 	dataFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
+	cleanedData = models.FileField(upload_to='uploads/%Y/%m/%d/',null=True)
+
+	def experimentalDesigns(self,):
+		return ExperimentalDesign.objects.filter(well__in=self.well_set.all()).distinct()
 
 	def __str__(self):
 		return self.name
@@ -57,13 +61,13 @@ class ExperimentalDesign(models.Model):
 	designElements = models.ManyToManyField("DesignElement")
 
 	def designElementString(self):
-		s = ",".join(str(x) for x in self.designElements.all())
+		s = ", ".join(str(x) for x in self.designElements.all())
 		return s
 
 	def __str__(self):
-		s = ",".join(str(x) for x in self.designElements.all())
+		# s = ",".join(str(x) for x in self.designElements.all())
 
-		return "%s - %s" % (self.strain,s)
+		return "%s - %s" % (self.strain,self.designElementString())
 
 
 class DesignElement(models.Model):
