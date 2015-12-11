@@ -28,9 +28,36 @@ th, td {
 }
 
 #navigation div{
-	border: 3px solid #737D21;
+	/*border: 3px solid black;*/
 	padding:5px;
-	background-color:#eeeeee;
+	background-color:#d9d9d9;
+}
+
+
+#controls ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #d9d9d9;
+    /*max-width: 500px;*/
+}
+
+#controls li a {
+    display: block;
+    width: 60px;
+    margin: 0;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#controls li{
+    float: left;
+}
+
+#controls li a:hover {
+    background-color: #111;
 }
 
 
