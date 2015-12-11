@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^plates/create/$', views.create_plate, name='plate-create'),
     url(r'^plates/$', PlateList.as_view(),name="plates"),
     url(r'^plates/(?P<pk>[0-9]+)/$', PlateDetail.as_view(), name='plate'),
+    url(r'^plates/(?P<pk>[0-9]+)/delete$', PlateDelete.as_view(), name='plate-delete'),
     # url(r'^plates/(?P<pk>[0-9]+)/update/$', UpdateView.as_view(model=Plate,fields=['name','experimenter','project'],success_url='/growthData/plates/'), name='plate-update'),
     url(r'^plates/(?P<pk>[0-9]+)/design/', views.design_plate, name='plate-design'),
 
@@ -31,6 +32,7 @@ urlpatterns = [
     
     url(r'^designs/$', ListView.as_view(model=Design), name='designs'),
     url(r'^designs/(?P<pk>[0-9]+)$', UpdateView.as_view(model=Design,fields=['name','description','type'],success_url='/growthData/designs/'), name='design'),
+    url(r'^designs/create$', CreateView.as_view(model=Design,fields=['name','description','type'],success_url='/growthData/designs/'), name='design-create'),
 
     url(r'^designElements/$', ListView.as_view(model=DesignElement), name='designElements'),
     url(r'^designElements/create$', CreateView.as_view(model=DesignElement,fields=['design','value'],success_url='/growthData/designElements/'), name='designElement-create'),
