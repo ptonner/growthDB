@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Wells{% endblock %}
+
+{% block content %}
+
+    <form enctype="multipart/form-data" method="post" action="{% url 'growthData:plate-design' plate.id %}">
+	{% csrf_token %}
+		<input type="submit" value="Update" />
+	    {{ form.as_p }}
+	</form>
+
+{% endblock %}

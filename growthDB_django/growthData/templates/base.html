@@ -1,27 +1,26 @@
-<!DOCTYPE html>
+{% load staticfiles %}
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css" />
-    <title>{% block title %}growthDB{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'growthData/style.css' %}" />
+    <title>growthDB - {% block title %}growthDB{% endblock %}</title>
 </head>
 
 <body>
-    <div id="wrap">    
-        <div id="sidebar">
-            {% block sidebar %}
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="{% url 'growthData:plates' %}">plates</a></li>
-                <li><a href="{% url 'growthData:wells' %}">wells</a></li>
-                <li><a href="{% url 'growthData:experimentalDesigns' %}">Experimental Designs</a></li>
-            </ul>
-            {% endblock %}
-        </div>
+    <div id="navigation">
+        {% block navigation %}
+            <div><a href="/">Home</a><br></div>
+            <div><a href="{% url 'growthData:plates' %}">Plates</a><br></div>
+            <div><a href="{% url 'growthData:wells' %}">Wells</a><br></div>
+            <div><a href="{% url 'growthData:experimentalDesigns' %}">Experimental<br> Designs</a><br></div>
+            <div><a href="{% url 'growthData:designElements' %}">Design<br> Elements</a><br></div>
+            <div><a href="{% url 'growthData:strains' %}">Strains</a><br></div>
+        {% endblock %}
+    </div>
 
-        <div id="content">
-            {% block content %}{% endblock %}
-        </div>
+    <div id="content">
+        {% block content %}{% endblock %}
     </div>
 </body>
 </html>

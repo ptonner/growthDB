@@ -3,7 +3,9 @@
 {% block title %}Plates{% endblock %}
 
 {% block content %}
-    <table style="width:100%" border="1">
+    <a href="{% url 'growthData:plate-create' %}">CREATE</a>
+
+    <table class="element-list">
     	<tr>
     		<th>Plate</th>
     		<th>Number of wells</th>

@@ -4,9 +4,15 @@
 
 {% block content %}
 
-    <div style="overflow-x:auto;">
+    <form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Update" />
+	</form>
 
-    <table class="element-list">
+
+	<H2>Wells using this experimental design:</H2>
+
+    <table style="width:100%" border="1">
     	<tr>
     		<th>Well</th>
     		<th>Plate</th>
@@ -32,5 +38,4 @@
         {% endfor %}
     </table>
 
-    </div>
 {% endblock %}

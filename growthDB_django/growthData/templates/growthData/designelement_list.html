@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Designs{% endblock %}
+
+{% block content %}
+
+    <a href="{% url 'growthData:designElement-create' %}">CREATE</a>
+
+    <table class="element-list">
+        <tr>
+            <!-- <th>Design Element</th> -->
+            <th>Parent design</th>
+            <th>Value</th>
+            <th>Experimental Designs with this element</th>
+        </tr>
+
+        {% for design in designelement_list %}
+            <tr>
+                
+                <td><a href="{% url 'growthData:design' design.design.id %}">{{ design.design|linebreaks }}</a></td>
+                <td>{{design.value}} </td>
+
+                <td>
+                    {% for ed in design.experimentaldesign_set.all %}
+                        <a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed|linebreaks }}</a>
+
+                        {%if i > 1%}
+                        ,
+                        {%endif%}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

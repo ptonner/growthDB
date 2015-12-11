@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Wells{% endblock %}
+
+{% block content %}
+
+    <a href="{% url 'growthData:experimentalDesign-create' %}">CREATE</a>
+
+    <table class="element-list">
+    	<tr>
+    		<th>Experimental Design</th>
+    		<th>Design Elements</th>
+    		<th>Strain</th>
+            <th>Number of wells</th>
+    	</tr>
+
+        {% for ed in experimentaldesign_list %}
+	        <tr>
+	            <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed }}</a></td>
+	            <td>{{ ed.designElementString }}</td>
+	            <td>{{ ed.strain }}</td>
+                <td>{{ ed.well_set.count}}</td>
+	            
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

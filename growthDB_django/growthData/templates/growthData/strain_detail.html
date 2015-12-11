@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Wells{% endblock %}
+
+{% block content %}
+
+<h1>{{ object.headline }}</h1>
+<p>{{ object.content }}</p>
+<p>Name: {{ object.name }}</p>
+<p>Parent: {{ object.parent|date }}</p>
+
+{% endblock %}

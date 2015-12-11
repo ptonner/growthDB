@@ -34,12 +34,9 @@ class Well(models.Model):
 	experimentalDesign = models.ForeignKey('ExperimentalDesign',null=True)
 	number = models.IntegerField(default=0)
 
-	# these three fields constitute the replicate information
+	# these two fields constitute the replicate information
 	plate = models.ForeignKey('Plate')
 	biologicalReplicate = models.IntegerField(default=0)
-	technicalReplicate = models.IntegerField(default=0)
-
-	unique_together = (("plate", "biologicalReplicate","technicalReplicate"),)
 
 	def __str__(self):
 		return "%s (%s) - (%s)" % (self.plate, self.number, self.experimentalDesign)

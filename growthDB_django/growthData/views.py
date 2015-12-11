@@ -2,11 +2,12 @@ from django.shortcuts import render,get_object_or_404, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.detail import DetailView
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView
 
 from .models import Plate, Well, ExperimentalDesign
-from .forms import PlateForm
+from .forms import PlateForm, PlateDesignForm
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -15,34 +16,8 @@ def well(request, well_id):
     return HttpResponse("You're looking at question %s." % well_id)
 
 def plate(request, plate_id):
-    # response = "You're looking at the results of plate %s."
-    # return HttpResponse(response % plate_id)
     plate = get_object_or_404(Plate, pk=plate_id)
-    # try:
-    #     plate = Plate.objects.get(pk=plate_id)
-    # except Plate.DoesNotExist:
-    #     raise Http404("Plate does not exist")
     return render(request, 'growthData/plate.html', {'plate': plate})
-
-# def plateCreate(request,):
-
-#     return render(request, 'growthData/plateCreate.html', {})
-    # question = get_object_or_404(Question, pk=question_id)
-    # try:
-    #     selected_choice = question.choice_set.get(pk=request.POST['choice'])
-    # except (KeyError, Choice.DoesNotExist):
-    #     # Redisplay the question voting form.
-    #     return render(request, 'polls/detail.html', {
-    #         'question': question,
-    #         'error_message': "You didn't select a choice.",
-    #     })
-    # else:
-    #     selected_choice.votes += 1
-    #     selected_choice.save()
-    #     # Always return an HttpResponseRedirect after successfully dealing
-    #     # with POST data. This prevents data from being posted twice if a
-    #     # user hits the Back button.
-    #     return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 def plateOverview(request):
     latest_plate_list = Plate.objects.order_by('-date')[:5]
@@ -54,11 +29,6 @@ def experimentalDesign(request, ed_id):
 
 
 # Plate views
-
-# class PlateCreate(CreateView):
-#     model = Plate
-#     fields = ['name','project','experimenter','dataFile']
-
 from django.utils import timezone
 import pandas as pd
 
@@ -74,14 +44,46 @@ def create_plate(request):
             plate = Plate(**form.cleaned_data)
             plate.save()
 
-            wells = [Well(plate=plate,number=i,biologicalReplicate=i,experimentalDesign=None) for i in range(200)]
+            wells = [Well(plate=plate,number=i,biologicalReplicate=0,experimentalDesign=None) for i in range(200)]
             [w.save() for w in wells]
 
             return HttpResponseRedirect('/growthData/plate/')
     else:
-    	print "not post"
         form = PlateForm()
-    return render(request, 'growthData/plate_form.html', {'form': form})
+    return render(request, 'growthData/platedesign_form.html', {'form': form})
+
+def design_plate(request,pk):
+    if request.method == 'POST':
+        form = PlateDesignForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            plate = Plate.objects.get(id=pk)
+            # plate = Plate(**form.cleaned_data)
+            ed = form.cleaned_data['experimentalDesign']
+            wells = form.cleaned_data['wells']
+
+            for w in wells:
+                w.experimentalDesign = ed
+                w.save()
+            
+            return HttpResponseRedirect('/growthData/plates/%s'%pk)
+    else:
+        plate = Plate.objects.get(id=pk)
+        form = PlateDesignForm()
+        form.fields['wells'].queryset = plate.well_set.all()
+
+        print plate.well_set.count()
+    return render(request, 'growthData/platedesign_form.html', {'form': form,'plate':plate})
+
+class PlateDetail(DetailView):
+    model = Plate
+
+    def get_context_data(self, **kwargs):
+        context = super(PlateDetail, self).get_context_data(**kwargs)
+        context['well_list'] = self.get_object().well_set.filter(plate=self.get_object())
+        context['ed_list'] = ExperimentalDesign.objects.filter(well__in=self.get_object().well_set.all()).distinct()
+        return context
+
 
 class PlateUpdate(UpdateView):
     model = Plate
@@ -117,18 +119,15 @@ class PlateDelete(DeleteView):
 class ExperimentalDesignList(ListView):
     model = ExperimentalDesign
 
-class ExperimentalDesignUpdate(UpdateView):
+# class ExperimentalDesignUpdate(UpdateView):
+class ExperimentalDesignUpdate(DetailView):
     model = ExperimentalDesign
 
-
-    fields = ['strain','designElements']
-    template_name_suffix = '_update_form'
+    # fields = ['strain','designElements']
+    # template_name_suffix = '_update_form'
+    # template_name_suffix = '_detail'
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super(ExperimentalDesignUpdate, self).get_context_data(**kwargs)
-        print dir(self)
-        print self.get_object()
-        # Add in a QuerySet of all the books
         context['well_list'] = self.get_object().well_set.filter(experimentalDesign=self.get_object())
         return context

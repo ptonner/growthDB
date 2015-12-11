@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Wells{% endblock %}
+
+{% block content %}
+
+    <a href="{% url 'growthData:strain-create' %}">CREATE</a>
+
+    <div style="overflow-x:auto;">
+
+    <table class="element-list">
+    	<tr>
+    		<th>name</th>
+    		<th>parent</th>
+    	</tr>
+
+        {% for strain in strain_list %}
+	        <tr>
+	            <td><a href="{% url 'growthData:strain' strain.id %}">{{ strain.name|linebreaks }}</a></td>
+
+                {% if strain.parent %}
+                    <td><a href="{% url 'growthData:strain' strain.parent.id %}">{{ strain.parent.name }}</a></td>
+                {% else %}
+                    <td>None</td>
+                {% endif %}
+	            
+            </tr>
+        {% endfor %}
+    </table>
+
+    </div>
+{% endblock %}

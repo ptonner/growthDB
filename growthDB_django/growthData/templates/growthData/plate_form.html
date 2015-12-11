@@ -1,6 +1,13 @@
-<!-- <form action="" method="post"> -->
-<form enctype="multipart/form-data" method="post" action="{% url 'growthData:plateCreate' %}">
-{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Create" />
-</form>
+{% extends "base.html" %}
+
+{% block title %}Plates{% endblock %}
+
+{% block content %}
+
+    <form enctype="multipart/form-data" method="post" action="{% url 'growthData:plate-create' %}">
+	{% csrf_token %}
+	    {{ form.as_p }}
+	    <input type="submit" value="Create" />
+	</form>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Plates{% endblock %}
+
+{% block content %}
+
+<h1>{{ object.headline }}</h1>
+<p>{{ object.content }}</p>
+<h1>{{ object.name }}</h1>
+
+<a href="{% url 'growthData:plate-design' object.id %}">DESIGN</a>
+
+<table>
+	<tr>
+		<th>Date</th>
+		<th>Project</th>
+		<th>Experimenter</th>
+    </tr>
+
+    <tr>
+    	<td>{{ object.date }}</td>
+    	<td>{{ object.project }}</td>
+    	<td>{{ object.experimenter }}</td>
+    </tr>
+</table>
+
+<table>
+    	<tr>
+    		<th>Experimental designs in this plate:</th>
+    	</tr>
+
+        {% for ed in ed_list %}
+	        <tr>
+	            <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed|linebreaks }}</a></td>
+            </tr>
+        {% endfor %}
+</table>
+
+<H2>Wells in this plate:</H2>
+
+    <table>
+    	<tr>
+    		<th>Well</th>
+    		<th>Plate</th>
+    		<th>Number</th>
+    		<th>Biological Replicae</th>
+    	</tr>
+
+        {% for well in well_list %}
+	        <tr>
+	            <td><a href="{% url 'growthData:well' well.id %}">{{ well|linebreaks }}</a></td>
+	            <td><a href="{% url 'growthData:plate' well.plate.id %}">{{ well.plate }}</a></td>
+	            <td>{{ well.number }}</a></td>
+	            <td>{{ well.biologicalReplicate }}</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+{% endblock %}

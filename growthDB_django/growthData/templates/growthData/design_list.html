@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+
+{% block title %}Designs{% endblock %}
+
+{% block content %}
+
+    <table class="element-list">
+    	<tr>
+    		<th>Design</th>
+            <th>Elements with this design</th>
+    	</tr>
+
+        {% for design in design_list %}
+            <tr>
+                <td><a href="{% url 'growthData:design' design.id %}">{{ design|linebreaks }}</a></td>
+                <td>
+                    {% for element in design.designElement_set %}    
+                    <a href="{% url 'growthData:designElement' element.id %}">{{ element|linebreaks }}</a>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
