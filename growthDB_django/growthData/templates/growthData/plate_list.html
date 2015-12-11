@@ -2,19 +2,24 @@
 
 {% block title %}Plates{% endblock %}
 
+{% block controls %}
+<div><a href="{% url 'growthData:plate-create' %}">CREATE</a></div>
+{% endblock %}
+
 {% block content %}
-    <a href="{% url 'growthData:plate-create' %}">CREATE</a>
 
     <table class="element-list">
     	<tr>
     		<th>Plate</th>
     		<th>Number of wells</th>
+            <th>Number of experimental designs</th>
     	</tr>
 
         {% for plate in plate_list %}
 	        <tr>
 	            <td><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></td>
 	            <td>{{ plate.well_set.count}}</td>
+                <td>{{ plate.experimentalDesigns.count}}</td>
             </tr>
         {% endfor %}
     </table>

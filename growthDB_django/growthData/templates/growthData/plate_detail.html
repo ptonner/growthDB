@@ -2,13 +2,18 @@
 
 {% block title %}Plates{% endblock %}
 
+{% block subheading %}
+{{ object.name }}
+{% endblock %}
+
+{% block controls %}
+<li><a href="{% url 'growthData:plate-design' object.id %}">DESIGN</a></li>
+<li><a href="{% url 'growthData:plate-delete' object.id %}">DELETE</a></li>
+{% endblock %}
+
 {% block content %}
 
-<h1>{{ object.headline }}</h1>
-<p>{{ object.content }}</p>
-<h1>{{ object.name }}</h1>
 
-<a href="{% url 'growthData:plate-design' object.id %}">DESIGN</a>
 
 <table>
 	<tr>

@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 
-{% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
-
 {% block title %}Designs{% endblock %}
+
+{% block controls %}
+<div><a href="{% url 'growthData:design-create' %}">CREATE</a></div>
+{% endblock %}
+
+{% block subheading %}
+Designs
+{% endblock %}
 
 {% block content %}
 
@@ -17,7 +22,7 @@
             <tr>
                 <td><a href="{% url 'growthData:design' design.id %}">{{ design|linebreaks }}</a></td>
                 <td>
-                    {% for element in design.designElement_set %}    
+                    {% for element in design.designelement_set.all %}    
                     <a href="{% url 'growthData:designElement' element.id %}">{{ element|linebreaks }}</a>
                     {% endfor %}
                 </td>

@@ -8,6 +8,8 @@
 </head>
 
 <body>
+    
+
     <div id="navigation">
         {% block navigation %}
             <div><a href="/">Home</a><br></div>
@@ -15,9 +17,16 @@
             <div><a href="{% url 'growthData:wells' %}">Wells</a><br></div>
             <div><a href="{% url 'growthData:experimentalDesigns' %}">Experimental<br> Designs</a><br></div>
             <div><a href="{% url 'growthData:designElements' %}">Design<br> Elements</a><br></div>
+            <div><a href="{% url 'growthData:designs' %}">Designs</a><br></div>
             <div><a href="{% url 'growthData:strains' %}">Strains</a><br></div>
         {% endblock %}
     </div>
+
+    <div id="controls"><ul>{% block controls %}{% endblock %}</ul></div>
+    
+    <h2>{% block subheading %}{% endblock %}</h2>
+
+    <br>
 
     <div id="content">
         {% block content %}{% endblock %}
