@@ -33,24 +33,34 @@ from django.utils import timezone
 import pandas as pd
 
 def handle_file(f):
-	data = pd.read_csv(f)
-	print data.shape
+    print "handle_file"
+    data = pd.read_csv(f)
+
+    assert data.columns[0].lower() == "time"
+
+    data = data.drop("Blank",1)
+
+    numWells = data.shape[1] - 1
+
+    return numWells
 
 def create_plate(request):
     if request.method == 'POST':
         form = PlateForm(request.POST, request.FILES)
 
         if form.is_valid():
+            numWells = handle_file(request.FILES['dataFile'])
+
             plate = Plate(**form.cleaned_data)
             plate.save()
 
-            wells = [Well(plate=plate,number=i,biologicalReplicate=0,experimentalDesign=None) for i in range(200)]
+            wells = [Well(plate=plate,number=i,biologicalReplicate=0,experimentalDesign=None) for i in range(numWells)]
             [w.save() for w in wells]
 
-            return HttpResponseRedirect('/growthData/plate/')
+            return HttpResponseRedirect('/growthData/plates/')
     else:
         form = PlateForm()
-    return render(request, 'growthData/platedesign_form.html', {'form': form})
+    return render(request, 'growthData/plate_form.html', {'form': form})
 
 def design_plate(request,pk):
     if request.method == 'POST':
@@ -91,7 +101,7 @@ class PlateUpdate(UpdateView):
 
 class PlateDelete(DeleteView):
     model = Plate
-    success_url = reverse_lazy('plateOverview')
+    success_url = reverse_lazy('growthData:plates')
 
 class PlateList(ListView):
     model = Plate
@@ -111,7 +121,7 @@ class WellCreate(CreateView):
     model = Well
     fields = ['name']
 
-class PlateDelete(DeleteView):
+class WellDelete(DeleteView):
     model = Well
     success_url = reverse_lazy('well')
 
