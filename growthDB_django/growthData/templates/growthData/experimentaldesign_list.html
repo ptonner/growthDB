@@ -2,9 +2,13 @@
 
 {% block title %}Wells{% endblock %}
 
-{% block content %}
+{% block subheading %}Experimental Designs{% endblock %}
 
-    <a href="{% url 'growthData:experimentalDesign-create' %}">CREATE</a>
+{% block controls %}
+<li><a href="{% url 'growthData:experimentalDesign-create' %}">CREATE</a></li>
+{% endblock %}
+
+{% block content %}
 
     <table class="element-list">
     	<tr>

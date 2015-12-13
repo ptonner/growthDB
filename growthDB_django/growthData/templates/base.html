@@ -8,23 +8,25 @@
 </head>
 
 <body>
-    
+
+    <h1>growthDB - 
+        {% block subheading %}{% endblock %}</h1>    
 
     <div id="navigation">
+        <ul>
         {% block navigation %}
-            <div><a href="/">Home</a><br></div>
-            <div><a href="{% url 'growthData:plates' %}">Plates</a><br></div>
-            <div><a href="{% url 'growthData:wells' %}">Wells</a><br></div>
-            <div><a href="{% url 'growthData:experimentalDesigns' %}">Experimental<br> Designs</a><br></div>
-            <div><a href="{% url 'growthData:designElements' %}">Design<br> Elements</a><br></div>
-            <div><a href="{% url 'growthData:designs' %}">Designs</a><br></div>
-            <div><a href="{% url 'growthData:strains' %}">Strains</a><br></div>
+            <li><a href="{% url 'growthData:index' %}">Home</a></li>
+            <li><a href="{% url 'growthData:plates' %}">Plates</a></li>
+            <li><a href="{% url 'growthData:wells' %}">Wells</a></li>
+            <li><a href="{% url 'growthData:experimentalDesigns' %}">Experimental Designs</a></li>
+            <li><a href="{% url 'growthData:designElements' %}">Design Elements</a></li>
+            <li><a href="{% url 'growthData:designs' %}">Designs</a></li>
+            <li><a href="{% url 'growthData:strains' %}">Strains</a></li>
         {% endblock %}
+        </ul>
     </div>
 
     <div id="controls"><ul>{% block controls %}{% endblock %}</ul></div>
-    
-    <h2>{% block subheading %}{% endblock %}</h2>
 
     <br>
 

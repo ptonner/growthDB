@@ -2,25 +2,49 @@
 
 {% block title %}Plates{% endblock %}
 
+{% block subheading %}Plates{% endblock %}
+
 {% block controls %}
-<div><a href="{% url 'growthData:plate-create' %}">CREATE</a></div>
+<li><a href="{% url 'growthData:plate-create' %}">CREATE</a></li>
 {% endblock %}
 
 {% block content %}
 
-    <table class="element-list">
-    	<tr>
-    		<th>Plate</th>
-    		<th>Number of wells</th>
-            <th>Number of experimental designs</th>
-    	</tr>
-
-        {% for plate in plate_list %}
-	        <tr>
-	            <td><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></td>
-	            <td>{{ plate.well_set.count}}</td>
-                <td>{{ plate.experimentalDesigns.count}}</td>
+    {% if plate_list %}
+        <table class="element-list">
+            <tr>
+                <th>Plate</th>
+                <th>Number of wells</th>
+                <th>Number of experimental designs</th>
             </tr>
-        {% endfor %}
-    </table>
+
+            {% for plate in plate_list %}
+                <tr>
+                    <td><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></td>
+                    <td>{{ plate.well_set.count}}</td>
+                    <td>{{ plate.experimentalDesigns.count}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {# .... **Now the pagination section** .... #}
+        {% if is_paginated %}
+            <div class="pagination">
+                <span class="page-links">
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'growthData:plates' %}?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+                    <span class="page-current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'growthData:plates' %}?page={{ page_obj.next_page_number }}">next</a>
+                    {% endif %}
+                </span>
+            </div>
+        {% endif %}
+    {% else %}
+        <p>No plates found!!! :(</p>
+    {% endif %}
+
 {% endblock %}
+

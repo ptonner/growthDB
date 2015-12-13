@@ -10,7 +10,7 @@ from .models import Plate, Well, ExperimentalDesign
 from .forms import PlateForm, PlateDesignForm
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return HttpResponse("Hello, world. You're at the growthDB index.")
 
 def well(request, well_id):
     return HttpResponse("You're looking at question %s." % well_id)
@@ -49,12 +49,15 @@ def create_plate(request):
         form = PlateForm(request.POST, request.FILES)
 
         if form.is_valid():
-            numWells = handle_file(request.FILES['dataFile'])
+            # numWells = handle_file(request.FILES['dataFile'])
 
             plate = Plate(**form.cleaned_data)
             plate.save()
 
-            wells = [Well(plate=plate,number=i,biologicalReplicate=0,experimentalDesign=None) for i in range(numWells)]
+            data = handle_data(plate)
+
+            # wells = [Well(plate=plate,number=i,biologicalReplicate=0,experimentalDesign=None) for i in range(numWells)]
+            wells = [Well(plate=plate,number=i,biologicalReplicate=0,experimentalDesign=None) for i in data.columns[1:]]
             [w.save() for w in wells]
 
             return HttpResponseRedirect('/growthData/plates/')
@@ -76,7 +79,7 @@ def design_plate(request,pk):
                 w.experimentalDesign = ed
                 w.save()
             
-            return HttpResponseRedirect('/growthData/plates/%s'%pk)
+            return HttpResponseRedirect('/growthData/plates/%s/design'%pk)
     else:
         plate = Plate.objects.get(id=pk)
         form = PlateDesignForm()
@@ -84,6 +87,87 @@ def design_plate(request,pk):
 
         print plate.well_set.count()
     return render(request, 'growthData/platedesign_form.html', {'form': form,'plate':plate})
+
+def plot_data(f):
+    data = pd.read_csv(f)
+
+    assert data.columns[0].lower() == "time"
+
+    data = data.drop("Blank",1)
+
+    for i in range(1,data.shape[1]):
+        plt.scatter(data.iloc[:,0],data.iloc[:,i])
+
+def parse_time(t):
+    import time
+
+    try:
+        return time.struct_time(time.strptime(t,'%H:%M:%S'))
+    except ValueError, e:
+        try:
+            t = time.strptime(t,'%d %H:%M:%S')
+            t = list(t)
+            t[2]+=1
+            return time.struct_time(t)
+        except ValueError, e:
+            raise Exception("Time format unknown")
+
+def handle_data(p):
+
+    import datetime
+    import numpy as np
+
+    data = pd.read_csv(p.dataFile)
+
+    assert data.columns[0].lower() == "time"
+    data = data.drop("Blank",1)
+
+    def convert_time(x):
+        delta = datetime.datetime(*x[:-2]) - datetime.datetime(*t[0][:-2])
+        return 24*delta.days + float(delta.seconds)/3600
+
+    t = data.iloc[:,0].apply(parse_time)
+    t = t.apply(convert_time).round(2)
+    data['Time'] = t
+
+    data.iloc[:,1:] = np.log(data.iloc[:,1:])
+    data.iloc[:,1:] = data.iloc[:,1:] - data.iloc[0,1:]
+
+    return data
+
+def plate_canvas(p):
+
+    data = handle_data(p)
+
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    from matplotlib.figure import Figure
+    from matplotlib.dates import DateFormatter
+    import datetime
+    import random
+
+    fig=Figure()
+    ax=fig.add_subplot(111)
+
+    for i in range(1,data.shape[1]):
+        ax.plot(data.iloc[:,0],data.iloc[:,i])
+
+    ax.set_xlabel("time (h)",fontsize=20)
+    ax.set_ylabel("log(od)",fontsize=20)
+
+    canvas=FigureCanvas(fig)
+
+    return canvas
+
+def plate_image(request,pk):
+
+    plate = Plate.objects.get(id=pk)
+    canvas = plate_canvas(plate)
+
+    response=HttpResponse(content_type='image/png')
+    canvas.print_png(response)
+    return response
+
+    # return HttpResponse(image_data, content_type="image/png")
 
 class PlateDetail(DetailView):
     model = Plate
@@ -105,11 +189,13 @@ class PlateDelete(DeleteView):
 
 class PlateList(ListView):
     model = Plate
+    paginate_by = 10
 
 # Well views
 
 class WellList(ListView):
     model = Well
+    paginate_by = 10
 
 class WellUpdate(UpdateView):
     model = Well

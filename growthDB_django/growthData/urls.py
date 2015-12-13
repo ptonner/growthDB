@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^plates/(?P<pk>[0-9]+)/delete$', PlateDelete.as_view(), name='plate-delete'),
     # url(r'^plates/(?P<pk>[0-9]+)/update/$', UpdateView.as_view(model=Plate,fields=['name','experimenter','project'],success_url='/growthData/plates/'), name='plate-update'),
     url(r'^plates/(?P<pk>[0-9]+)/design/', views.design_plate, name='plate-design'),
+    url(r'^plates/(?P<pk>[0-9]+)/image$', views.plate_image, name='plate-image'),
 
     # url(r'^experimentalDesigns/(?P<pk>[0-9]+)/$', ExperimentalDesignUpdate.as_view(success_url='/growthData/experimentalDesigns'), name='experimentalDesign'),
     url(r'^experimentalDesigns/(?P<pk>[0-9]+)/$', ExperimentalDesignUpdate.as_view(), name='experimentalDesign'),

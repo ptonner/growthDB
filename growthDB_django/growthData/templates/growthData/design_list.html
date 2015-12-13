@@ -2,12 +2,10 @@
 
 {% block title %}Designs{% endblock %}
 
-{% block controls %}
-<div><a href="{% url 'growthData:design-create' %}">CREATE</a></div>
-{% endblock %}
+{% block subheading %}Designs{% endblock %}
 
-{% block subheading %}
-Designs
+{% block controls %}
+<li><a href="{% url 'growthData:design-create' %}">CREATE</a></li>
 {% endblock %}
 
 {% block content %}

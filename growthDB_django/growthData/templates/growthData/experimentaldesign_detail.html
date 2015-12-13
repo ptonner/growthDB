@@ -2,11 +2,13 @@
 
 {% block title %}Wells{% endblock %}
 
+{% block subheading %}Experimental design{% endblock %}
+
 {% block content %}
 
 <h1>{{ object.headline }}</h1>
 <p>{{ object.content }}</p>
-<p>Strain: <a href="{% url 'growthData:strain' object.strain.id %}">{{ object.strain.name }}</a></p>
+<h2>Strain: <a href="{% url 'growthData:strain' object.strain.id %}">{{ object.strain.name }}</a></h2>
 
 <h2>Design Elements:</h2>
 

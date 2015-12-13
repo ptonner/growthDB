@@ -2,35 +2,55 @@
 
 {% block title %}Wells{% endblock %}
 
+{% block subheading %}Wells{% endblock %}
+
 {% block content %}
 
     <div style="overflow-x:auto;">
 
-    <table class="element-list">
-    	<tr>
-    		<th>Well</th>
-    		<th>Plate</th>
-    		<th>Number</th>
-    		<th>Biological Replicae</th>
-    		<th>Technical Replicate</th>
-    		<th>Experimental Design</th>
-    	</tr>
+    {% if well_list %}
+        <table class="element-list">
+        <tr>
+            <th>Well</th>
+            <th>Plate</th>
+            <th>Number</th>
+            <th>Biological Replicae</th>
+            <th>Experimental Design</th>
+        </tr>
 
         {% for well in well_list %}
-	        <tr>
-	            <td><a href="{% url 'growthData:well' well.id %}">{{ well|linebreaks }}</a></td>
-	            <td><a href="{% url 'growthData:plate' well.plate.id %}">{{ well.plate }}</a></td>
-	            <td>{{ well.number }}</a></td>
-	            <td>{{ well.biologicalReplicate }}</a></td>
-	            <td>{{ well.technicalReplicate }}</a></td>
-	            {% if well.experimentalDesign.id%}
-	            	<td><a href="{% url 'growthData:experimentalDesign' well.experimentalDesign.id %}">{{ well.experimentalDesign }}</a></td>
-	            {% else %}
-	            	<td>{{ well.experimentalDesign }}</td>
-	            {% endif %}
+            <tr>
+                <td><a href="{% url 'growthData:well' well.id %}">{{ well|linebreaks }}</a></td>
+                <td><a href="{% url 'growthData:plate' well.plate.id %}">{{ well.plate }}</a></td>
+                <td>{{ well.number }}</a></td>
+                <td>{{ well.biologicalReplicate }}</a></td>
+                {% if well.experimentalDesign.id%}
+                    <td><a href="{% url 'growthData:experimentalDesign' well.experimentalDesign.id %}">{{ well.experimentalDesign }}</a></td>
+                {% else %}
+                    <td>{{ well.experimentalDesign }}</td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>
+        {# .... **Now the pagination section** .... #}
+        {% if is_paginated %}
+            <div class="pagination">
+                <span class="page-links">
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'growthData:wells' %}?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+                    <span class="page-current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'growthData:wells' %}?page={{ page_obj.next_page_number }}">next</a>
+                    {% endif %}
+                </span>
+            </div>
+        {% endif %}
+    {% else %}
+        <p>No wells found!!! :(</p>
+    {% endif %}
 
     </div>
 {% endblock %}
