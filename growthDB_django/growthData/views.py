@@ -79,7 +79,7 @@ def design_plate(request,pk):
                 w.experimentalDesign = ed
                 w.save()
             
-            return HttpResponseRedirect('/growthData/plates/%s/design'%pk)
+            return HttpResponseRedirect('/growthData/plates/%s/design_plate'%pk)
     else:
         plate = Plate.objects.get(id=pk)
         form = PlateDesignForm()
@@ -139,20 +139,43 @@ def plate_canvas(p):
 
     data = handle_data(p)
 
+    import matplotlib.pyplot as plt
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     from matplotlib.figure import Figure
     from matplotlib.dates import DateFormatter
     import datetime
     import random
 
-    fig=Figure()
+    cmap = plt.get_cmap("spectral")
+    buff = .05
+
+    experimentalDesigns = list(p.experimentalDesigns())
+    label = [str(ed) for ed in experimentalDesigns] + ["None"]
+
+    fig=Figure(figsize=(10,6))
     ax=fig.add_subplot(111)
 
     for i in range(1,data.shape[1]):
-        ax.plot(data.iloc[:,0],data.iloc[:,i])
+        w = Well.objects.get(number=data.columns[i],plate=p)
+
+        if w.experimentalDesign:
+            ind = experimentalDesigns.index(w.experimentalDesign)
+        else:
+            ind = len(experimentalDesigns)
+
+        l = ""
+        if label[ind]:
+            l = label[ind]
+            label[ind] = None
+
+        if ind < len(experimentalDesigns):
+            cnum = 1.*(ind-buff+1)/len(experimentalDesigns) + buff
+            ax.plot(data.iloc[:,0],data.iloc[:,i],color=cmap(cnum),label=l,linewidth=2,alpha=.7)
 
     ax.set_xlabel("time (h)",fontsize=20)
     ax.set_ylabel("log(od)",fontsize=20)
+
+    ax.legend(loc="best",fontsize=10)
 
     canvas=FigureCanvas(fig)
 
