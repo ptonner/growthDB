@@ -16,6 +16,13 @@ th, td {
     padding: 5px;
 }
 
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+
 #controls {
 	text-align: center;
     max-width: 500px;
@@ -24,12 +31,13 @@ th, td {
     line-height:30px;
     /*background-color:#eeeeee;*/
     float:left;
-    padding:5px;
+    /*padding:5px;*/
+    /*padding-top: 5px;*/
 }
 
 #controls div{
 	/*border: 3px solid black;*/
-	padding:5px;
+	/*padding:5px;*/
 	background-color:#d9d9d9;
 }
 

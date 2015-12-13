@@ -13,7 +13,9 @@
 
 {% block content %}
 
-<img src="{% url 'growthData:plate-image' object.id %}"/>
+<div><img src="{% url 'growthData:plate-image' object.id %}"/></div>
+
+<div>
 
 <table>
 	<tr>
@@ -40,6 +42,8 @@
             </tr>
         {% endfor %}
 </table>
+
+</div>
 
 <H2>Wells in this plate:</H2>
 

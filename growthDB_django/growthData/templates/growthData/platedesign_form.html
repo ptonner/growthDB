@@ -6,6 +6,10 @@
 
 {% block content %}
 
+	<h2><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></h2>
+
+	<div><img src="{% url 'growthData:plate-image' plate.id %}"/></div>
+
     <form enctype="multipart/form-data" method="post" action="{% url 'growthData:plate-design' plate.id %}">
 	{% csrf_token %}
 		<input type="submit" value="Update" />

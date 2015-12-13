@@ -1,12 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}Wells{% endblock %}
+{% block title %}{{ object.name }}{% endblock %}
+
+{% block subheading %}{{ object.name }}{% endblock %}
 
 {% block content %}
 
 <h1>{{ object.headline }}</h1>
 <p>{{ object.content }}</p>
-<p>Name: {{ object.name }}</p>
-<p>Parent: {{ object.parent|date }}</p>
+<h2>Name: {{ object.name }}</h2>
+<h2>Parent: <a href="{% url 'growthData:strain' object.parent.id %}">{{ object.parent }}</a></h2>
+
+
+
+<H2>Experimental designs using this strain:</H2>
+
+	<table class="element-list">
+    	<tr>
+    		<th>Experimental Design</th>
+    		<th>Design Elements</th>
+    		<th>Strain</th>
+            <th>Number of wells</th>
+    	</tr>
+
+        {% for ed in object.experimentaldesign_set.all %}
+	        <tr>
+	            <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed }}</a></td>
+	            <td>{{ ed.designElementString }}</td>
+	            <td>{{ ed.strain }}</td>
+                <td>{{ ed.well_set.count}}</td>
+	            
+            </tr>
+        {% endfor %}
+    </table>
 
 {% endblock %}

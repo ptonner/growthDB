@@ -73,15 +73,32 @@ def design_plate(request,pk):
 
         if form.is_valid():
             
-            ed = form.cleaned_data['experimentalDesign']
-            wells = form.cleaned_data['wells']
+            # ed = form.cleaned_data['experimentalDesign']
+            designElements = form.cleaned_data['designElements']
+            strain = form.cleaned_data['strain']
+            wellString = form.cleaned_data['wells']
+
+            wells = []
+            for w in wellString.split(","):
+                # w = str(w)
+                if "-" in w:
+                    split = w.split("-")
+                    low = int(split[0])
+                    high = int(split[1])
+                    w = list(Well.objects.filter(plate=plate,number__in=range(low,high+1)))
+                    wells = wells + w                    
+                else:
+                    w = Well.objects.get(plate=p,number=int(w))
+                    wells.append(w)
+
+            ed,created = ExperimentalDesign.objects.get_or_create(strain=strain,designElements=designElements)
 
             for w in wells:
                 w.experimentalDesign = ed
                 w.save()
             
             return HttpResponseRedirect('/growthData/plates/%s/design'%pk)
-            
+
     else:
         form = PlateDesignForm()
         form.fields['wells'].queryset = plate.well_set.all()
@@ -153,7 +170,7 @@ def plate_canvas(p):
     experimentalDesigns = list(p.experimentalDesigns())
     label = [str(ed) for ed in experimentalDesigns] + ["None"]
 
-    fig=Figure(figsize=(10,6))
+    fig=Figure(figsize=(10,8))
     ax=fig.add_subplot(111)
 
     for i in range(1,data.shape[1]):
@@ -188,7 +205,7 @@ def plate_image(request,pk):
     canvas = plate_canvas(plate)
 
     response=HttpResponse(content_type='image/png')
-    canvas.print_png(response)
+    canvas.print_png(response,bbox_inches="tight",pad=1.0)
     return response
 
     # return HttpResponse(image_data, content_type="image/png")
