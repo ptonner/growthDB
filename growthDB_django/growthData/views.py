@@ -66,12 +66,13 @@ def create_plate(request):
     return render(request, 'growthData/plate_form.html', {'form': form})
 
 def design_plate(request,pk):
+    plate = Plate.objects.get(id=pk)
+
     if request.method == 'POST':
         form = PlateDesignForm(request.POST, request.FILES)
 
         if form.is_valid():
-            plate = Plate.objects.get(id=pk)
-            # plate = Plate(**form.cleaned_data)
+            
             ed = form.cleaned_data['experimentalDesign']
             wells = form.cleaned_data['wells']
 
@@ -79,9 +80,9 @@ def design_plate(request,pk):
                 w.experimentalDesign = ed
                 w.save()
             
-            return HttpResponseRedirect('/growthData/plates/%s/design_plate'%pk)
+            return HttpResponseRedirect('/growthData/plates/%s/design'%pk)
+            
     else:
-        plate = Plate.objects.get(id=pk)
         form = PlateDesignForm()
         form.fields['wells'].queryset = plate.well_set.all()
 
@@ -169,7 +170,7 @@ def plate_canvas(p):
             label[ind] = None
 
         if ind < len(experimentalDesigns):
-            cnum = 1.*(ind-buff+1)/len(experimentalDesigns) + buff
+            cnum = (1. - 2*buff)*(ind+1)/len(experimentalDesigns) + buff
             ax.plot(data.iloc[:,0],data.iloc[:,i],color=cmap(cnum),label=l,linewidth=2,alpha=.7)
 
     ax.set_xlabel("time (h)",fontsize=20)
