@@ -88,10 +88,15 @@ def design_plate(request,pk):
                     w = list(Well.objects.filter(plate=plate,number__in=range(low,high+1)))
                     wells = wells + w                    
                 else:
-                    w = Well.objects.get(plate=p,number=int(w))
+                    w = Well.objects.get(plate=plate,number=int(w))
                     wells.append(w)
 
-            ed,created = ExperimentalDesign.objects.get_or_create(strain=strain,designElements=designElements)
+            # print designElements
+            if len(designElements) == 0:
+                designElements = None
+                ed,created = ExperimentalDesign.objects.get_or_create(strain=strain,designElements__isnull=True)
+            else:
+                ed,created = ExperimentalDesign.objects.get_or_create(strain=strain,designElements=designElements)
 
             for w in wells:
                 w.experimentalDesign = ed
@@ -157,6 +162,8 @@ def plate_canvas(p):
 
     data = handle_data(p)
 
+    ylim = (data.iloc[:,1:].values.min(),data.iloc[:,1:].values.max())
+
     import matplotlib.pyplot as plt
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     from matplotlib.figure import Figure
@@ -170,8 +177,10 @@ def plate_canvas(p):
     experimentalDesigns = list(p.experimentalDesigns())
     label = [str(ed) for ed in experimentalDesigns] + ["None"]
 
-    fig=Figure(figsize=(10,8))
-    ax=fig.add_subplot(111)
+    s = 4
+    ncol = 5
+    nrow = (len(experimentalDesigns)+1)/ncol+1
+    fig=Figure(figsize=(s*ncol,s*nrow))
 
     for i in range(1,data.shape[1]):
         w = Well.objects.get(number=data.columns[i],plate=p)
@@ -181,19 +190,37 @@ def plate_canvas(p):
         else:
             ind = len(experimentalDesigns)
 
+        ax=fig.add_subplot(nrow,ncol,ind+1)
+
         l = ""
         if label[ind]:
             l = label[ind]
             label[ind] = None
 
-        if ind < len(experimentalDesigns):
-            cnum = (1. - 2*buff)*(ind+1)/len(experimentalDesigns) + buff
-            ax.plot(data.iloc[:,0],data.iloc[:,i],color=cmap(cnum),label=l,linewidth=2,alpha=.7)
+        # if ind < len(experimentalDesigns):
+        cnum = (1. - 2*buff)*(ind+1)/len(experimentalDesigns) + buff
+        ax.plot(data.iloc[:,0],data.iloc[:,i],color=cmap(cnum),label=l,linewidth=2,alpha=.7)
+        ax.set_ylim(ylim)
 
+
+    for i in range(len(experimentalDesigns)):
+        ax=fig.add_subplot(nrow,ncol,i+1)
+        ax.set_title(str(experimentalDesigns[i]),fontsize=10)
+
+        if (i+1) % ncol == 1:
+            ax.set_ylabel("log(od)",fontsize=20)
+        if (i+1) > (nrow-1)*ncol:
+            ax.set_xlabel("time (h)",fontsize=20)
+        
+
+    ax = fig.add_subplot(nrow,ncol,len(experimentalDesigns)+1)
+    ax.set_title("none")
     ax.set_xlabel("time (h)",fontsize=20)
     ax.set_ylabel("log(od)",fontsize=20)
 
-    ax.legend(loc="best",fontsize=10)
+   
+
+    # ax.legend(loc="best",fontsize=10)
 
     canvas=FigureCanvas(fig)
 
@@ -205,7 +232,7 @@ def plate_image(request,pk):
     canvas = plate_canvas(plate)
 
     response=HttpResponse(content_type='image/png')
-    canvas.print_png(response,bbox_inches="tight",pad=1.0)
+    canvas.print_png(response,bbox_inches="tight",pad=0)
     return response
 
     # return HttpResponse(image_data, content_type="image/png")

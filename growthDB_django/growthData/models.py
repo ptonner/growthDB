@@ -58,7 +58,7 @@ class Strain(models.Model):
 
 class ExperimentalDesign(models.Model):
 	strain = models.ForeignKey('Strain')
-	designElements = models.ManyToManyField("DesignElement")
+	designElements = models.ManyToManyField("DesignElement",blank=True)
 
 	def designElementString(self):
 		s = ", ".join(str(x) for x in self.designElements.all())
@@ -67,7 +67,7 @@ class ExperimentalDesign(models.Model):
 	def __str__(self):
 		# s = ",".join(str(x) for x in self.designElements.all())
 
-		return "%s - %s" % (self.strain,self.designElementString())
+		return "%s - %s" % (self.strain.name,self.designElementString())
 
 
 class DesignElement(models.Model):

@@ -20,5 +20,5 @@ class PlateDesignForm(forms.Form):
     # wells = forms.ModelMultipleChoiceField(Well.objects.all(),widget=forms.SelectMultiple(attrs={'size': 200}))
 
     strain = forms.ModelChoiceField(Strain.objects.all())
-    designElements = forms.ModelMultipleChoiceField(DesignElement.objects.all(),label="Design Elements",)
+    designElements = forms.ModelMultipleChoiceField(DesignElement.objects.all(),label="Design Elements",required=False)
     wells = forms.CharField()
