@@ -10,7 +10,14 @@ from .models import Plate, Well, ExperimentalDesign
 from .forms import PlateForm, PlateDesignForm
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the growthDB index.")
+    plates = Plate.objects.all()
+    experimentalDesigns = ExperimentalDesign.objects.all()
+
+    context = {'plates': plates, 'experimentalDesigns':experimentalDesigns}
+    return render(request, 'growthData/index.html', context)
+
+    # return HttpResponse("Hello, world. You're at the growthDB index.")
+
 
 def well(request, well_id):
     return HttpResponse("You're looking at question %s." % well_id)
@@ -140,6 +147,8 @@ def handle_data(p):
     import datetime
     import numpy as np
 
+    print dir(p.dataFile)
+
     data = pd.read_csv(p.dataFile)
 
     assert data.columns[0].lower() == "time"
@@ -198,8 +207,11 @@ def plate_canvas(p):
             label[ind] = None
 
         # if ind < len(experimentalDesigns):
-        cnum = (1. - 2*buff)*(ind+1)/len(experimentalDesigns) + buff
-        ax.plot(data.iloc[:,0],data.iloc[:,i],color=cmap(cnum),label=l,linewidth=2,alpha=.7)
+        if len(experimentalDesigns) > 0:
+            cnum = (1. - 2*buff)*(ind+1)/len(experimentalDesigns) + buff
+        else:
+            cnum = 0
+        ax.plot(data.iloc[:,0],data.iloc[:,i],color=cmap(cnum),label=l,linewidth=2,alpha=.5)
         ax.set_ylim(ylim)
 
 
@@ -213,10 +225,15 @@ def plate_canvas(p):
             ax.set_xlabel("time (h)",fontsize=20)
         
 
+    i = len(experimentalDesigns)+1
     ax = fig.add_subplot(nrow,ncol,len(experimentalDesigns)+1)
-    ax.set_title("none")
-    ax.set_xlabel("time (h)",fontsize=20)
-    ax.set_ylabel("log(od)",fontsize=20)
+    ax.set_title("none",fontsize=10)
+    # ax.set_xlabel("time (h)",fontsize=20)
+    # ax.set_ylabel("log(od)",fontsize=20)
+    if (i+1) % ncol == 1:
+        ax.set_ylabel("log(od)",fontsize=20)
+    if (i+1) > (nrow-1)*ncol:
+        ax.set_xlabel("time (h)",fontsize=20)
 
    
 
@@ -282,6 +299,7 @@ class WellDelete(DeleteView):
 # Experimental Design
 class ExperimentalDesignList(ListView):
     model = ExperimentalDesign
+    paginate_by = 10
 
 # class ExperimentalDesignUpdate(UpdateView):
 class ExperimentalDesignUpdate(DetailView):
