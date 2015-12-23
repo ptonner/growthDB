@@ -70,7 +70,7 @@ def create_plate(request):
             return HttpResponseRedirect('/growthData/plates/')
     else:
         form = PlateForm()
-    return render(request, 'growthData/plate_form.html', {'form': form})
+    return render(request, 'microbial_growth_data/plate_form.html', {'form': form})
 
 def design_plate(request,pk):
     plate = Plate.objects.get(id=pk)
