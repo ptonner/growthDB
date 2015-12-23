@@ -18,6 +18,20 @@
 
 {% endfor %}
 
+<H2>Plates using this experimental design:</H2>
+
+    <table>
+        <tr>
+            <th>Plate</th>
+        </tr>
+
+        {% for plate in object.plates %}
+            <tr>
+                <td><a href="{% url 'growthData:plate' plate.id %}">{{ plate|linebreaks }}</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+
 <H2>Wells using this experimental design:</H2>
 
     <table>

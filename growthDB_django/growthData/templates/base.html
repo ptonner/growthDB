@@ -4,6 +4,9 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="{% static 'growthData/style.css' %}" />
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script type="text/javascript" src="/media/main.js"></script>
     <title>growthDB - {% block title %}growthDB{% endblock %}</title>
 </head>
 
@@ -13,18 +16,16 @@
         {% block subheading %}{% endblock %}</h1>   </div>
      
 
-    <div id="navigation">
-        <ul>
-        {% block navigation %}
-            <li><a href="{% url 'growthData:index' %}">Home</a></li>
-            <li><a href="{% url 'growthData:plates' %}">Plates</a></li>
-            <li><a href="{% url 'growthData:wells' %}">Wells</a></li>
-            <li><a href="{% url 'growthData:experimentalDesigns' %}">Experimental Designs</a></li>
-            <li><a href="{% url 'growthData:designElements' %}">Design Elements</a></li>
-            <li><a href="{% url 'growthData:designs' %}">Designs</a></li>
-            <li><a href="{% url 'growthData:strains' %}">Strains</a></li>
-        {% endblock %}
-        </ul>
+    <div id="navigation" class="container">
+        <div class="row">
+          <div class="col-md-1"><a href="{% url 'growthData:index' %}">Home</a></div>
+          <div class="col-md-1"><a href="{% url 'growthData:plates' %}">Plates</a></div>
+          <div class="col-md-1"><a href="{% url 'growthData:wells' %}">Wells</a></div>
+          <div class="col-md-2"><a href="{% url 'growthData:experimentalDesigns' %}">Experimental Designs</a></div>
+          <div class="col-md-2"><a href="{% url 'growthData:designElements' %}">Design Elements</a></div>
+          <div class="col-md-1"><a href="{% url 'growthData:designs' %}">Designs</a></div>
+          <div class="col-md-1"><a href="{% url 'growthData:strains' %}">Strains</a></div>
+        </div>
     </div>
 
     <div id="controls"><ul>{% block controls %}{% endblock %}</ul></div>
@@ -36,3 +37,4 @@
     </div>
 </body>
 </html>
+
