@@ -60,6 +60,9 @@ class ExperimentalDesign(models.Model):
 	strain = models.ForeignKey('Strain')
 	designElements = models.ManyToManyField("DesignElement",blank=True)
 
+	def plates(self,):
+		return Plate.objects.filter(well__in=self.well_set.all()).distinct()
+
 	def designElementString(self):
 		s = ", ".join(str(x) for x in self.designElements.all())
 		return s
