@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class GrowthdataConfig(AppConfig):
-    name = 'growthData'
+class MicrobialGrowthDataConfig(AppConfig):
+    name = 'microbial_growth_data'
