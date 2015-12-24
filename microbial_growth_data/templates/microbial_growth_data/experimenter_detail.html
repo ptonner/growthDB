@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Project - {{ object.name }}{% endblock %}
+
+{% block subheading %}{{ object.name }}{% endblock %}
+
+{% block controls %}
+<li><a href="{% url 'growthData:experimenter-delete' object.id %}">DELETE</a></li>
+{% endblock %}
+
+{% block content %}
+
+    <h1>{{ object.headline }}</h1>
+    <p>{{ object.content }}</p>
+    <h2>Name: {{ object.name }}</h2>
+    <h2>Description: {{ object.description }}</h2>
+
+        {% if object.plate_set.count > 0 %}
+
+            <H2>Plates in this project:</H2>
+
+            <table class="element-list">
+                <tr>
+                    <th>Experimental Design</th>
+                    <th>Design Elements</th>
+                    <th>Strain</th>
+                    <th>Number of wells</th>
+                </tr>
+
+                {% for ed in object.plate_set.all %}
+                    <tr>
+                        <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed }}</a></td>
+                        <td>{{ ed.designElementString }}</td>
+                        <td>{{ ed.strain }}</td>
+                        <td>{{ ed.well_set.count}}</td>
+                        
+                    </tr>
+                {% endfor %}
+            </table>
+            {# .... **Now the pagination section** .... #}
+            {% if is_paginated %}
+                <div class="pagination">
+                    <span class="page-links">
+                        {% if page_obj.has_previous %}
+                            <a href="{% url 'growthData:plates' %}?page={{ page_obj.previous_page_number }}">previous</a>
+                        {% endif %}
+                        <span class="page-current">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </span>
+                        {% if page_obj.has_next %}
+                            <a href="{% url 'growthData:plates' %}?page={{ page_obj.next_page_number }}">next</a>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+        {% else %}
+            <p>No plates found for this project</p>
+        {% endif %}
+
+{% endblock %}
+

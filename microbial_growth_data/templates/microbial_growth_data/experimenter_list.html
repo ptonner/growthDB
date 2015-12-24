@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Projects{% endblock %}
+
+{% block subheading %}Projects{% endblock %}
+
+{% block controls %}
+<li><a href="{% url 'growthData:experimenter-create' %}">CREATE</a></li>
+{% endblock %}
+
+{% block content %}
+
+    {% if experimenter_list %}
+        <table class="element-list">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>number of plates</th>
+            </tr>
+
+            {% for experimenter in experimenter_list %}
+                <tr>
+                    <td><a href="{% url 'growthData:experimenter' experimenter.id %}">{{ experimenter.name }}</a></td>
+                    <td>{{ experimenter.email}}</td>
+                    <td>{{ experimenter.plate_set.count}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {# .... **Now the pagination section** .... #}
+        {% if is_paginated %}
+            <div class="pagination">
+                <span class="page-links">
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'growthData:plates' %}?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+                    <span class="page-current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'growthData:plates' %}?page={{ page_obj.next_page_number }}">next</a>
+                    {% endif %}
+                </span>
+            </div>
+        {% endif %}
+    {% else %}
+        <p>No experimenters found!!! :(</p>
+    {% endif %}
+
+{% endblock %}
+
