@@ -26,12 +26,14 @@
             <th>Date</th>
             <th>Project</th>
             <th>Experimenter</th>
+            <th>Number of wells</th>
         </tr>
 
         <tr>
             <td>{{ object.date }}</td>
             <td>{{ object.project }}</td>
             <td>{{ object.experimenter }}</td>
+            <td>{{ object.well_set.count }}</td>
         </tr>
         </table>
 
@@ -46,24 +48,6 @@
                         <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed|linebreaks }}</a></td>
                     </tr>
                 {% endfor %}
-        </table>
-        <H2>Wells in this plate:</H2>
-        <table>
-            <tr>
-                <th>Well</th>
-                <th>Plate</th>
-                <th>Number</th>
-                <th>Biological Replicae</th>
-            </tr>
-
-            {% for well in well_list %}
-                <tr>
-                    <td><a href="{% url 'growthData:well' well.id %}">{{ well|linebreaks }}</a></td>
-                    <td><a href="{% url 'growthData:plate' well.plate.id %}">{{ well.plate }}</a></td>
-                    <td>{{ well.number }}</a></td>
-                    <td>{{ well.biologicalReplicate }}</a></td>
-                </tr>
-            {% endfor %}
         </table>
         </div>
     </div>
