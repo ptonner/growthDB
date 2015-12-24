@@ -14,7 +14,7 @@ def index(request):
     experimentalDesigns = ExperimentalDesign.objects.all()
 
     context = {'plates': plates, 'experimentalDesigns':experimentalDesigns}
-    return render(request, 'growthData/index.html', context)
+    return render(request, 'microbial_growth_data/index.html', context)
 
     # return HttpResponse("Hello, world. You're at the growthDB index.")
 
@@ -67,7 +67,7 @@ def create_plate(request):
             wells = [Well(plate=plate,number=i,biologicalReplicate=0,experimentalDesign=None) for i in data.columns[1:]]
             [w.save() for w in wells]
 
-            return HttpResponseRedirect('/growthData/plates/')
+            return HttpResponseRedirect('plates/')
     else:
         form = PlateForm()
     return render(request, 'microbial_growth_data/plate_form.html', {'form': form})
@@ -98,25 +98,34 @@ def design_plate(request,pk):
                     w = Well.objects.get(plate=plate,number=int(w))
                     wells.append(w)
 
-            # print designElements
-            if len(designElements) == 0:
-                designElements = None
-                ed,created = ExperimentalDesign.objects.get_or_create(strain=strain,designElements__isnull=True)
-            else:
-                ed,created = ExperimentalDesign.objects.get_or_create(strain=strain,designElements=designElements)
+
+            designElementSet = set(designElements)
+            eds = ExperimentalDesign.objects.filter(strain=strain)
+            found = False
+            for ed in eds:
+                otherSet = set(ed.designElements.all())
+                if otherSet == designElementSet:
+                    found=True
+                    break
+
+            if not found:
+                ed = ExperimentalDesign(strain=strain)
+                ed.save()
+                ed.designElements.add(*designElements)
+                ed.save()
 
             for w in wells:
                 w.experimentalDesign = ed
                 w.save()
             
-            return HttpResponseRedirect('/growthData/plates/%s/design'%pk)
+            return HttpResponseRedirect('/plates/%s/design'%pk)
 
     else:
         form = PlateDesignForm()
         form.fields['wells'].queryset = plate.well_set.all()
 
         print plate.well_set.count()
-    return render(request, 'growthData/platedesign_form.html', {'form': form,'plate':plate})
+    return render(request, 'microbial_growth_data/platedesign_form.html', {'form': form,'plate':plate})
 
 def plot_data(f):
     data = pd.read_csv(f)
@@ -187,7 +196,7 @@ def plate_canvas(p):
     label = [str(ed) for ed in experimentalDesigns] + ["None"]
 
     s = 4
-    ncol = 5
+    ncol = 3
     nrow = (len(experimentalDesigns)+1)/ncol+1
     fig=Figure(figsize=(s*ncol,s*nrow))
 

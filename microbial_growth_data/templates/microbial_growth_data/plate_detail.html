@@ -17,60 +17,65 @@
     <div id="loader"></div>
 </div> -->
 
+<div class="container">
+    <div class="row">
+      <div class="col-md-10"><img class="img-responsive" src="{% url 'growthData:plate-image' object.id %}"/></div>
+      <div class="col-md-2">
+        <table>
+        <tr>
+            <th>Date</th>
+            <th>Project</th>
+            <th>Experimenter</th>
+        </tr>
 
+        <tr>
+            <td>{{ object.date }}</td>
+            <td>{{ object.project }}</td>
+            <td>{{ object.experimenter }}</td>
+        </tr>
+        </table>
 
+        <H2>Experimental designs:</H2>
+        <table>
+                <!-- <tr>
+                    <th></th>
+                </tr> -->
 
-<div><img src="{% url 'growthData:plate-image' object.id %}"/></div>
+                {% for ed in ed_list %}
+                    <tr>
+                        <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed|linebreaks }}</a></td>
+                    </tr>
+                {% endfor %}
+        </table>
+        <H2>Wells in this plate:</H2>
+        <table>
+            <tr>
+                <th>Well</th>
+                <th>Plate</th>
+                <th>Number</th>
+                <th>Biological Replicae</th>
+            </tr>
+
+            {% for well in well_list %}
+                <tr>
+                    <td><a href="{% url 'growthData:well' well.id %}">{{ well|linebreaks }}</a></td>
+                    <td><a href="{% url 'growthData:plate' well.plate.id %}">{{ well.plate }}</a></td>
+                    <td>{{ well.number }}</a></td>
+                    <td>{{ well.biologicalReplicate }}</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        </div>
+    </div>
+</div>
 
 <div>
 
-<table>
-	<tr>
-		<th>Date</th>
-		<th>Project</th>
-		<th>Experimenter</th>
-    </tr>
 
-    <tr>
-    	<td>{{ object.date }}</td>
-    	<td>{{ object.project }}</td>
-    	<td>{{ object.experimenter }}</td>
-    </tr>
-</table>
-
-<table>
-    	<tr>
-    		<th>Experimental designs in this plate:</th>
-    	</tr>
-
-        {% for ed in ed_list %}
-	        <tr>
-	            <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed|linebreaks }}</a></td>
-            </tr>
-        {% endfor %}
-</table>
 
 </div>
 
-<H2>Wells in this plate:</H2>
 
-    <table>
-    	<tr>
-    		<th>Well</th>
-    		<th>Plate</th>
-    		<th>Number</th>
-    		<th>Biological Replicae</th>
-    	</tr>
-
-        {% for well in well_list %}
-	        <tr>
-	            <td><a href="{% url 'growthData:well' well.id %}">{{ well|linebreaks }}</a></td>
-	            <td><a href="{% url 'growthData:plate' well.plate.id %}">{{ well.plate }}</a></td>
-	            <td>{{ well.number }}</a></td>
-	            <td>{{ well.biologicalReplicate }}</a></td>
-            </tr>
-        {% endfor %}
-    </table>
 
 
 {% endblock %}

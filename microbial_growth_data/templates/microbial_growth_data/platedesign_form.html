@@ -6,14 +6,21 @@
 
 {% block content %}
 
-	<h2><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></h2>
+<h2><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></h2>
 
-	<div><img src="{% url 'growthData:plate-image' plate.id %}"/></div>
+<div class="container">
+    <div class="row">
+      <div class="col-md-8"><img class="img-responsive" src="{% url 'growthData:plate-image' plate.id %}"/></div>
+      <div class="col-md-4">
+      	<form enctype="multipart/form-data" method="post" action="{% url 'growthData:plate-design' plate.id %}">
+		{% csrf_token %}
+			<input type="submit" value="Update" />
+		    {{ form.as_p }}
+		</form>
+      </div>
+  </div>
+</div>
 
-    <form enctype="multipart/form-data" method="post" action="{% url 'growthData:plate-design' plate.id %}">
-	{% csrf_token %}
-		<input type="submit" value="Update" />
-	    {{ form.as_p }}
-	</form>
+    
 
 {% endblock %}
