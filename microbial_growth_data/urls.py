@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse_lazy
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
@@ -52,4 +52,6 @@ urlpatterns = [
     url(r'^experimenters/create/$', CreateView.as_view(model=Experimenter,fields=['name','email'],success_url='/experimenters/'), name='experimenter-create'),
     url(r'^experimenter/(?P<pk>[0-9]+)$', DetailView.as_view(model=Experimenter), name='experimenter'),
     url(r'^experimenter/(?P<pk>[0-9]+)/delete$', DeleteView.as_view(model=Experimenter,success_url="/experimenters"), name='experimenter-delete'),
+
+    url(r'^search/', include('haystack.urls')),
 ]
