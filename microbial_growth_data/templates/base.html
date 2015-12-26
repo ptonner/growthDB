@@ -26,10 +26,15 @@
           <div class="col-md-2"><a href="{% url 'growthData:designElements' %}">Design Elements</a></div>
           <div class="col-md-1"><a href="{% url 'growthData:designs' %}">Designs</a></div>
           <div class="col-md-1"><a href="{% url 'growthData:strains' %}">Strains</a></div>
+          <div><b>logged in as:</b> {{ user.username}} <a href="{% url 'logout' %}">logout</a></div>
         </div>
     </div>
 
-    <div id="controls"><ul>{% block controls %}{% endblock %}</ul></div>
+    <div id="controls">
+      <ul>
+        {% block controls %}{% endblock %}
+      </ul>
+    </div>
 
     <br>
 

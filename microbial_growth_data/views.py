@@ -5,34 +5,38 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Plate, Well, ExperimentalDesign, Design, DesignElement
 from .forms import PlateForm, PlateDesignForm
 
+@login_required
 def index(request):
-    plates = Plate.objects.all()
-    experimentalDesigns = ExperimentalDesign.objects.all()
 
-    context = {'plates': plates, 'experimentalDesigns':experimentalDesigns}
-    return render(request, 'microbial_growth_data/index.html', context)
+    if request.user.is_authenticated():
+        plates = Plate.objects.all()
+        experimentalDesigns = ExperimentalDesign.objects.all()
 
-    # return HttpResponse("Hello, world. You're at the growthDB index.")
+        context = {'plates': plates, 'experimentalDesigns':experimentalDesigns}
+        return render(request, 'microbial_growth_data/index.html', context)
+    else:
+        return HttpResponse("you're not logged in, get lost.")
 
+# def well(request, well_id):
+#     return HttpResponse("You're looking at question %s." % well_id)
 
-def well(request, well_id):
-    return HttpResponse("You're looking at question %s." % well_id)
+# def plate(request, plate_id):
+#     plate = get_object_or_404(Plate, pk=plate_id)
+#     return render(request, 'growthData/plate.html', {'plate': plate})
 
-def plate(request, plate_id):
-    plate = get_object_or_404(Plate, pk=plate_id)
-    return render(request, 'growthData/plate.html', {'plate': plate})
+# def plateOverview(request):
+#     latest_plate_list = Plate.objects.order_by('-date')[:5]
+#     context = {'latest_plate_list': latest_plate_list}
+#     return render(request, 'growthData/plateOverview.html', context)
 
-def plateOverview(request):
-    latest_plate_list = Plate.objects.order_by('-date')[:5]
-    context = {'latest_plate_list': latest_plate_list}
-    return render(request, 'growthData/plateOverview.html', context)
-
-def experimentalDesign(request, ed_id):
-    return HttpResponse("You're voting on experimental design %s." % ed_id)
+# def experimentalDesign(request, ed_id):
+#     return HttpResponse("You're voting on experimental design %s." % ed_id)
 
 
 # Plate views
@@ -72,6 +76,7 @@ def create_plate(request):
         form = PlateForm()
     return render(request, 'microbial_growth_data/plate_form.html', {'form': form})
 
+@login_required
 def design_plate(request,pk,form=None):
     plate = Plate.objects.get(id=pk)
 
@@ -265,6 +270,7 @@ def plate_canvas(p):
 
     return canvas
 
+@login_required
 def plate_image(request,pk):
 
     plate = Plate.objects.get(id=pk)
@@ -276,55 +282,84 @@ def plate_image(request,pk):
 
     # return HttpResponse(image_data, content_type="image/png")
 
-class PlateDetail(DetailView):
+class PlateDetail(LoginRequiredMixin,DetailView):
     model = Plate
 
     def get_context_data(self, **kwargs):
         context = super(PlateDetail, self).get_context_data(**kwargs)
-        context['well_list'] = self.get_object().well_set.filter(plate=self.get_object())
+        context['well_list'] = self.get_object().well_set.all()#filter(plate=self.get_object())
         context['ed_list'] = ExperimentalDesign.objects.filter(well__in=self.get_object().well_set.all()).distinct()
+        
+        expDesignWells = []
+        for ed in context['ed_list']:
+            wells = self.get_object().well_set.filter(experimentalDesign=ed)
+            expDesignWells.append([w.number for w in wells])
+
+        wellStrings = []
+        for wells in expDesignWells:
+            s = ""
+            i = 0
+
+            while i < len(wells):
+                curr = i
+
+                while i<len(wells)-1 and wells[i]+1 == wells[i+1]:
+                    i+= 1
+
+                if curr != i:
+                    s += "%d - %d, " % (wells[curr],wells[i])
+                else:
+                    s += "%d, " % wells[curr]
+                i+=1
+            wellStrings.append(s[:-2])
+
+
+        context['wellStrings'] = wellStrings
+
+        context['expDesign_wellStrings'] = zip(context['ed_list'],wellStrings)
+
         return context
 
 
-class PlateUpdate(UpdateView):
-    model = Plate
-    fields = ['name']
+# class PlateUpdate(UpdateView):
+#     model = Plate
+#     fields = ['name']
 
-class PlateDelete(DeleteView):
+class PlateDelete(LoginRequiredMixin,DeleteView):
     model = Plate
     success_url = reverse_lazy('growthData:plates')
 
-class PlateList(ListView):
+class PlateList(LoginRequiredMixin,ListView):
     model = Plate
     paginate_by = 10
 
 # Well views
 
-class WellList(ListView):
+class WellList(LoginRequiredMixin,ListView):
     model = Well
     paginate_by = 10
 
-class WellUpdate(UpdateView):
+class WellUpdate(LoginRequiredMixin,UpdateView):
     model = Well
     template_name_suffix = '_update_form'
 
     fields = ['experimentalDesign','biologicalReplicate','technicalReplicate']
 
-class WellCreate(CreateView):
-    model = Well
-    fields = ['name']
+# class WellCreate(CreateView):
+#     model = Well
+#     fields = ['name']
 
-class WellDelete(DeleteView):
-    model = Well
-    success_url = reverse_lazy('well')
+# class WellDelete(DeleteView):
+#     model = Well
+#     success_url = reverse_lazy('well')
 
 # Experimental Design
-class ExperimentalDesignList(ListView):
+class ExperimentalDesignList(LoginRequiredMixin,ListView):
     model = ExperimentalDesign
     paginate_by = 10
 
 # class ExperimentalDesignUpdate(UpdateView):
-class ExperimentalDesignUpdate(DetailView):
+class ExperimentalDesignUpdate(LoginRequiredMixin,DetailView):
     model = ExperimentalDesign
 
     # fields = ['strain','designElements']

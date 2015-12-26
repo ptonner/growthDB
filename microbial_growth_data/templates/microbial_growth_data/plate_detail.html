@@ -19,8 +19,8 @@
 
 <div class="container">
     <div class="row">
-      <div class="col-md-8"><img class="img-responsive" src="{% url 'growthData:plate-image' object.id %}"/></div>
-      <div class="col-md-4">
+      <div class="col-md-10">
+        <img class="img-responsive" src="{% url 'growthData:plate-image' object.id %}"/>
         <table>
         <tr>
             <th>Date</th>
@@ -39,16 +39,26 @@
 
         <H5><b>Experimental designs:</b></H5>
         <table>
-                <!-- <tr>
+                <tr>
+                    <th>strain</th>
+                    <th>designs</th>
+                    <th>wells</th>
                     <th></th>
-                </tr> -->
+                    
+                </tr>
 
-                {% for ed in ed_list %}
+                {% for ed,ws in expDesign_wellStrings %}
                     <tr>
-                        <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">{{ ed|linebreaks }}</a></td>
+                        <td>{{ ed.strain.name }}</td>
+                        <td>{{ ed.designElementString|linebreaks }}</td>
+                        <td>{{ ws|linebreaks }}</td>
+                        <td><a href="{% url 'growthData:experimentalDesign' ed.id %}">view design</a></td>
                     </tr>
                 {% endfor %}
         </table>
+      </div>
+      <div class="col-md-2">
+        
         </div>
     </div>
 </div>

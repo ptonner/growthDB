@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
 	url(r'^', include('microbial_growth_data.urls')),
     url(r'^admin/', admin.site.urls),
+    url('^accounts/logout/', auth_views.logout,{'next_page':'/'}),
+    url('^accounts/', include('django.contrib.auth.urls'))
+
 ]
