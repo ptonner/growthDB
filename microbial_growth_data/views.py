@@ -6,7 +6,7 @@ from django.views.generic.detail import DetailView
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView
 
-from .models import Plate, Well, ExperimentalDesign
+from .models import Plate, Well, ExperimentalDesign, Design, DesignElement
 from .forms import PlateForm, PlateDesignForm
 
 def index(request):
@@ -72,7 +72,7 @@ def create_plate(request):
         form = PlateForm()
     return render(request, 'microbial_growth_data/plate_form.html', {'form': form})
 
-def design_plate(request,pk):
+def design_plate(request,pk,form=None):
     plate = Plate.objects.get(id=pk)
 
     if request.method == 'POST':
@@ -81,7 +81,7 @@ def design_plate(request,pk):
         if form.is_valid():
             
             # ed = form.cleaned_data['experimentalDesign']
-            designElements = form.cleaned_data['designElements']
+            # designElements = form.cleaned_data['designElements']
             strain = form.cleaned_data['strain']
             wellString = form.cleaned_data['wells']
 
@@ -98,6 +98,16 @@ def design_plate(request,pk):
                     w = Well.objects.get(plate=plate,number=int(w))
                     wells.append(w)
 
+            designElements = []
+
+            for i in range(10):
+                design = form.cleaned_data['design_%d'%i]
+                value = form.cleaned_data['value_%d'%i]
+
+                design, created = Design.objects.get_or_create(name=design)
+                designElement,created = DesignElement.objects.get_or_create(design=design,value=value)
+                designElements.append(designElement)
+            # designElements = [designElement]
 
             designElementSet = set(designElements)
             eds = ExperimentalDesign.objects.filter(strain=strain)
@@ -118,13 +128,16 @@ def design_plate(request,pk):
                 w.experimentalDesign = ed
                 w.save()
             
-            return HttpResponseRedirect('/plates/%s/design'%pk)
+            # return HttpResponseRedirect('/plates/%s/design'%pk)
+            from django.shortcuts import redirect
+            redirect('/plates/%s/design'%pk)
 
     else:
-        form = PlateDesignForm()
-        form.fields['wells'].queryset = plate.well_set.all()
+        if not form:
+            form = PlateDesignForm()
+            form.fields['wells'].queryset = plate.well_set.all()
 
-        print plate.well_set.count()
+        # print plate.well_set.count()
     return render(request, 'microbial_growth_data/platedesign_form.html', {'form': form,'plate':plate})
 
 def plot_data(f):
@@ -196,9 +209,9 @@ def plate_canvas(p):
     label = [str(ed) for ed in experimentalDesigns] + ["None"]
 
     s = 4
-    ncol = 3
+    ncol = 4
     nrow = (len(experimentalDesigns)+1)/ncol+1
-    fig=Figure(figsize=(s*ncol,s*nrow))
+    fig=Figure(figsize=(s*ncol,s*nrow),tight_layout=True)
 
     for i in range(1,data.shape[1]):
         w = Well.objects.get(number=data.columns[i],plate=p)
@@ -226,23 +239,23 @@ def plate_canvas(p):
 
     for i in range(len(experimentalDesigns)):
         ax=fig.add_subplot(nrow,ncol,i+1)
-        ax.set_title(str(experimentalDesigns[i]),fontsize=10)
+        ax.set_title(",\n".join(str(experimentalDesigns[i]).split(",")),fontsize=15)
 
         if (i+1) % ncol == 1:
-            ax.set_ylabel("log(od)",fontsize=20)
+            ax.set_ylabel("log(od)",fontsize=15)
         if (i+1) > (nrow-1)*ncol:
-            ax.set_xlabel("time (h)",fontsize=20)
+            ax.set_xlabel("time (h)",fontsize=15)
         
 
     i = len(experimentalDesigns)+1
     ax = fig.add_subplot(nrow,ncol,len(experimentalDesigns)+1)
-    ax.set_title("none",fontsize=10)
+    ax.set_title("none",fontsize=15)
     # ax.set_xlabel("time (h)",fontsize=20)
     # ax.set_ylabel("log(od)",fontsize=20)
     if (i+1) % ncol == 1:
-        ax.set_ylabel("log(od)",fontsize=20)
+        ax.set_ylabel("log(od)",fontsize=15)
     if (i+1) > (nrow-1)*ncol:
-        ax.set_xlabel("time (h)",fontsize=20)
+        ax.set_xlabel("time (h)",fontsize=15)
 
    
 

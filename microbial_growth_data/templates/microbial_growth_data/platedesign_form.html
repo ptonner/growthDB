@@ -10,15 +10,65 @@
 
 <div class="container">
     <div class="row">
-      <div class="col-md-8"><img class="img-responsive" src="{% url 'growthData:plate-image' plate.id %}"/></div>
-      <div class="col-md-4">
-      	<form enctype="multipart/form-data" method="post" action="{% url 'growthData:plate-design' plate.id %}">
-		{% csrf_token %}
-			<input type="submit" value="Update" />
-		    {{ form.as_p }}
-		</form>
-      </div>
-  </div>
+        <div class="col-md-8"><img class="img-responsive" src="{% url 'growthData:plate-image' plate.id %}"/></div>
+        <div class="col-md-4">
+          <form enctype="multipart/form-data" method="post" action="{% url 'growthData:plate-design' plate.id %}">
+            {% csrf_token %}
+                <div><b>strain:</b> {{ form.strain }}</div>
+                <table>
+                  <tr>
+                    <th>design</th>
+                    <th>value</th>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_0 }}</td>
+                    <td>{{ form.value_0 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_1 }}</td>
+                    <td>{{ form.value_1 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_2 }}</td>
+                    <td>{{ form.value_2 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_3 }}</td>
+                    <td>{{ form.value_3 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_4 }}</td>
+                    <td>{{ form.value_4 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_5 }}</td>
+                    <td>{{ form.value_5 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_6 }}</td>
+                    <td>{{ form.value_6 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_7 }}</td>
+                    <td>{{ form.value_7 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_8 }}</td>
+                    <td>{{ form.value_8 }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{ form.design_9 }}</td>
+                    <td>{{ form.value_9 }}</td>
+                  </tr>
+                </table>
+                <div><b>wells: </b>{{ form.wells }}</div>
+                <input type="submit" value="Design" />
+          </form>
+        </div>
+    </div>
+    <div class="row">
+      
+    </div>
 </div>
 
     
