@@ -10,3 +10,7 @@ The app outlines structures for:
 * **experimental design**: a collection of **design elements** and a **strain**
 * **design elements**: specific elements of an **experimental design**
 * **strain**: different strains with growth data stored in the app
+
+
+#### note about django-haystack:
+pip installation for django-haystack produced error "'module' object has no attribute 'get_model'" when performing search. installign django-haystack from github repository solved this issue.
