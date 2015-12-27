@@ -9,6 +9,7 @@ class Plate(models.Model):
 	date = models.DateField(auto_now_add=True)
 	dataFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
 	cleanedData = models.FileField(upload_to='uploads/%Y/%m/%d/',null=True)
+	image = models.FileField(upload_to='uploads/plate-images/',null=True)
 
 	def experimentalDesigns(self,):
 		return ExperimentalDesign.objects.filter(well__in=self.well_set.all()).distinct()
