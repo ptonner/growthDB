@@ -8,16 +8,7 @@ class PlateForm(forms.Form):
 	date = forms.DateField(widget=forms.SelectDateWidget())
 	dataFile = forms.FileField()
 
-
 class PlateDesignForm(forms.Form):
-    # def __init__(self, pk, *args, **kwargs):
-    #     super(PlateDesignForm, self).__init__(*args, **kwargs)
-
-    #     self.fields['experimentalDesigns'].queryset = 
-    #     self.fields['to_user'].queryset = self.fields['to_user'].queryset.exclude(id=current_user.id)
-
-    # experimentalDesign = forms.ModelChoiceField(ExperimentalDesign.objects.all(),empty_label=None)
-    # wells = forms.ModelMultipleChoiceField(Well.objects.all(),widget=forms.SelectMultiple(attrs={'size': 200}))
 
     strain = forms.ModelChoiceField(Strain.objects.all())
     design_0 = forms.CharField(required=False)
@@ -40,5 +31,20 @@ class PlateDesignForm(forms.Form):
     value_8 = forms.CharField(required=False)
     design_9 = forms.CharField(required=False)
     value_9 = forms.CharField(required=False)
-    # designElements = forms.ModelMultipleChoiceField(DesignElement.objects.all(),label="Design Elements",required=False)
     wells = forms.CharField()
+
+class WellsReplicateForm(forms.Form):
+
+    def __init__(self,*args,**kwargs):
+        wells = kwargs.pop('wells')
+        super(WellsReplicateForm,self).__init__(*args,**kwargs)
+
+        for w in wells:
+            self.fields['%d'%w.number] = forms.IntegerField(min_value=0,initial=w.biologicalReplicate)
+
+
+class WellReplicateForm(forms.Form):
+
+    biologicalReplicate = forms.IntegerField(label="Biological Replicate",min_value=0)
+
+

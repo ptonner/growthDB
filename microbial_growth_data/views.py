@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Plate, Well, ExperimentalDesign, Design, DesignElement
-from .forms import PlateForm, PlateDesignForm
+from .forms import PlateForm, PlateDesignForm,WellReplicateForm, WellsReplicateForm
 
 @login_required
 def index(request):
@@ -282,6 +282,90 @@ def plate_image(request,pk):
 
     # return HttpResponse(image_data, content_type="image/png")
 
+def buildPlateContext(context,plate):
+
+    context['well_list'] = plate.well_set.all()
+    context['ed_list'] = ExperimentalDesign.objects.filter(well__in=plate.well_set.all()).distinct()
+    
+    expDesignWells = []
+    for ed in context['ed_list']:
+        wells = plate.well_set.filter(experimentalDesign=ed)
+        expDesignWells.append([w.number for w in wells])
+
+    wellStrings = []
+    for wells in expDesignWells:
+        s = ""
+        i = 0
+
+        while i < len(wells):
+            curr = i
+
+            while i<len(wells)-1 and wells[i]+1 == wells[i+1]:
+                i+= 1
+
+            if curr != i:
+                s += "%d - %d, " % (wells[curr],wells[i])
+            else:
+                s += "%d, " % wells[curr]
+            i+=1
+        wellStrings.append(s[:-2])
+
+
+    context['wellStrings'] = wellStrings
+
+    context['expDesign_wellStrings'] = zip(context['ed_list'],wellStrings)
+
+    return context
+        
+
+from django.forms.formsets import formset_factory
+
+@login_required
+def plate_replicate(request,pk,form=None):
+    plate = Plate.objects.get(id=pk)
+
+    if request.method == 'POST':
+        # form = PlateDesignForm(request.POST, request.FILES)
+        wellForms = []
+        for ed in plate.experimentalDesigns():
+            wells = ed.well_set.filter(plate=plate).all()
+            form = WellsReplicateForm(request.POST,wells=wells)
+            form.experimentalDesign=ed
+            wellForms.append(form)
+
+        # if form.is_valid():
+        if all([wf.is_valid() for wf in wellForms]):
+
+            for wf in wellForms:
+                for f in wf.fields:
+                    w = Well.objects.get(plate=plate,number=int(f))
+                    w.biologicalReplicate = wf[f].value()
+                    w.save()            
+            
+            # return HttpResponseRedirect('/plates/%s/design'%pk)
+            from django.shortcuts import redirect
+            redirect('/plates/%s/replicate'%pk)
+
+    else:
+        if not form:
+
+            # WellReplicateFormSet = formset_factory(WellsReplicateForm)
+
+            wellForms = []
+            for ed in plate.experimentalDesigns():
+                wells = ed.well_set.filter(plate=plate).all()
+                form = WellsReplicateForm(wells=wells)
+                form.experimentalDesign=ed
+                wellForms.append(form)
+
+            # wells = plate.well_set.all()
+            # form = WellReplicateForm({'biologicalReplicate':wells[0].biologicalReplicate})
+            # form.fields['biologicalReplicate'].label=wells[0].number
+            
+
+        # print plate.well_set.count()
+    return render(request, 'microbial_growth_data/platereplicate_form.html', {'wellForms':wellForms,'experimentalDesigns':plate.experimentalDesigns,'plate':plate})
+
 class PlateDetail(LoginRequiredMixin,DetailView):
     model = Plate
 
@@ -343,7 +427,7 @@ class WellUpdate(LoginRequiredMixin,UpdateView):
     model = Well
     template_name_suffix = '_update_form'
 
-    fields = ['experimentalDesign','biologicalReplicate','technicalReplicate']
+    fields = ['experimentalDesign','biologicalReplicate']
 
 # class WellCreate(CreateView):
 #     model = Well

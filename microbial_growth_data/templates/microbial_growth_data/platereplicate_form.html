@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Design Plate{% endblock %}
+
+{% block subheading %}Design Plate{% endblock %}
+
+{% block content %}
+
+<h2><a href="{% url 'growthData:plate' plate.id %}">{{ plate.name }}</a></h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8"><img class="img-responsive" src="{% url 'growthData:plate-image' plate.id %}"/></div>
+        <div class="col-md-4">
+          <form action="{% url 'growthData:plate-replicate' plate.id%}" method="post"> 
+            <input type="submit" value="Submit" /><br>
+              {% csrf_token %}
+
+              {% for wellForm in wellForms %}
+                {{ wellForm.experimentalDesign | linebreaks}}
+                {{ wellForm.as_p }}
+                <br>
+              {% endfor %}
+              </form>
+        </div>
+    </div>
+    <div class="row">
+      
+    </div>
+</div>
+
+    
+
+{% endblock %}
