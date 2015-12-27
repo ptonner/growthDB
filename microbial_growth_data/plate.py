@@ -48,7 +48,7 @@ def handle_data(p):
 
     return data
 
-def plate_canvas(p):
+def plate_plot(p):
 
     data = handle_data(p)
 
@@ -109,23 +109,26 @@ def plate_canvas(p):
     if (i+1) > (nrow-1)*ncol:
         ax.set_xlabel("time (h)",fontsize=15)
 
-   
+    return fig
 
-    # ax.legend(loc="best",fontsize=10)
+def plate_canvas(p):
 
+    fig = plate_plot(p)
     canvas=FigureCanvas(fig)
 
     return canvas
 
 def save_plate_image(plate):
     from StringIO import StringIO
+    from io import BytesIO
     from django.core.files import File
     from django.core.files.base import ContentFile
 
+    # fig = plate_plot(plate)
     canvas = plate_canvas(plate)
-    f = StringIO()
-    plt.savefig(f)
+    f = BytesIO()
+    canvas.print_png(f)
 
     content_file = ContentFile(f.getvalue())
-    plate.image_field.save(plate.name+'.png', content_file)
+    plate.image.save(plate.name+'.png', content_file)
     plate.save()

@@ -105,6 +105,9 @@ def design_plate(request,pk,form=None):
             for w in wells:
                 w.experimentalDesign = ed
                 w.save()
+
+            plate.changed = True
+            plate.save()
             
             # return HttpResponseRedirect('/plates/%s/design'%pk)
             from django.shortcuts import redirect
@@ -123,16 +126,18 @@ def design_plate(request,pk,form=None):
 def plate_image(request,pk):
 
     plate = Plate.objects.get(id=pk)
+    
+    if plate.changed:
+        save_plate_image(plate)
+        plate.changed=False
+        plate.save()
 
-    # save_plate_image(plate)
+    # canvas = plate_canvas(plate)
 
-    canvas = plate_canvas(plate)
+    response=HttpResponse(plate.image,content_type='image/png')
+    # canvas.print_png(response,bbox_inches="tight",pad=0)
 
-    response=HttpResponse(content_type='image/png')
-    canvas.print_png(response,bbox_inches="tight",pad=0)
     return response
-
-    # return HttpResponse(image_data, content_type="image/png")
 
 def buildPlateContext(context,plate):
 
