@@ -337,10 +337,10 @@ def plate_replicate(request,pk,form=None):
         if all([wf.is_valid() for wf in wellForms]):
 
             for wf in wellForms:
-                for f in wf.fields:
-                    w = Well.objects.get(plate=plate,number=int(f))
+                numbers = [int(f) for f in wf.fields]
+                wells = Well.objects.filter(plate=plate,number__in=numbers)
+                for w in wells:
                     w.biologicalReplicate = wf[f].value()
-                    w.save()            
             
             # return HttpResponseRedirect('/plates/%s/design'%pk)
             from django.shortcuts import redirect
