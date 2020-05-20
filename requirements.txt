@@ -25,7 +25,7 @@ functools32==3.2.3.post1
 h5py==2.2.1
 hamster-indicator==0.0.0
 html5lib==0.999
-httplib2==0.9
+httplib2==0.18.0
 idna==0.9
 ipython==3.1.0
 jdcal==1.0
