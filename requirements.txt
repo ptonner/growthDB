@@ -93,7 +93,7 @@ Twisted-Core==14.0.2
 Twisted-Web==14.0.2
 ubuntu-tweak==0.8.7
 unity-lens-photos==1.0
-urllib3==1.9.1
+urllib3==1.26.5
 variety==0.5.4
 vboxapi==1.0
 virtualenv==12.1.1
