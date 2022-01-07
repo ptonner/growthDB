@@ -11,7 +11,7 @@ cobra==0.3.2
 command-not-found==0.3
 compizconfig-python==0.9.12.1
 configobj==5.0.6
-cvxopt==1.1.6
+cvxopt==1.2.7
 Cython==0.23.4
 debtagshw==0.1
 decorator==3.4.0
