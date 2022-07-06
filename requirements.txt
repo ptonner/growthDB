@@ -24,7 +24,7 @@ fdasrsf==1.2.1
 functools32==3.2.3.post1
 h5py==2.2.1
 hamster-indicator==0.0.0
-html5lib==0.999
+html5lib==0.999999999
 httplib2==0.9
 idna==0.9
 ipython==3.1.0
