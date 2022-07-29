@@ -36,7 +36,7 @@ lockfile==0.8
 lxml==3.4.2
 MarkupSafe==0.23
 matplotlib==1.4.3
-mistune==0.5.1
+mistune==2.0.3
 mock==1.0.1
 mutagen==1.23
 ndg-httpsclient==0.3.2
